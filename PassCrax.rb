@@ -1,45 +1,59 @@
 #!/usr/bin/env ruby
-require './wordlist_cracker'
-require './pass_analyzer'
-require './salt_crack'
-begin
+
+require 'digest'
+
+def pass_crack(hash, hashtype)
    grn = "\e[32m"
    blu = "\e[34m"
    ylw = "\e[33m"
    red = "\e[31m"
    rst = "\e[0m"
-   cyn = "\e[36m"
-   loop do
-       
-   pass_crax = <<~ART
-    #{cyn} ____    __                ____    ____     __          #{rst}
-    #{cyn}|  /\\\\  /  \\   ___   ___  /\\___\\  |  /\\\\   /  \\  /\\    /\\ #{rst}
-    #{ylw}|_/_// / /\\ \\ /  /  /  / / /      |_/_//  / /\\ \\ \\ \\  / /#{rst}
-    #{ylw}| /    \\/--\\/ \\___  \\___ | \\      | \\_    \\/__\\/  \\//\\/#{rst}
-    #{cyn}/|     /    \\     \\     \\ \\/____  /|  \\/\\ /    \\ /\\/  \\/\\ #{rst}
-    #{cyn}\\|     \\/  \\/ /___/ /___/  \\____/ \\|   \\/ \\/  \\/ \\/    \\/#{rst}
-    ART
-   puts "\n\n\n#{pass_crax}"
 
-   pass_analyze()
+wordlist_dir = "Wordlist/"            
+wordlist_files = Dir.glob("#{wordlist_dir}*.txt")
+            if wordlist_files.empty?          
+            puts "\n#{red}Error: No Files Found In #{wordlist_dir}#{rst}"
+           return
+           end
+            wordlist_files.each do |file|
+               puts "\n#{blu}Scanning File: #{file}...#{rst}"
+               File.foreach(file) do |word|
+               word.chomp!
 
-  
-   puts "\n#{blu}SELECT ONE\n#{rst}#{grn} [1]Salted Password Cracker\n [2]Pure Password Cracker#{rst}"
-   slct = gets.chomp.to_i
 
-       case slct
-       when 1
-           salt_crack(hash)
+   hash_type = case hashtype
+    when "md5"
+        Digest::MD5.hexdigest(word)
+    
+    when "sha1"
+        Digest::SHA1.hexdigest(word)
 
-       when 2
-           pass_crack(hash)
+    when "sha256"
+        Digest::SHA256.hexdigest(word)
 
-       else
-           print "\n#{red}Error: Invalid Input!#{rst}"
-   end
-   end
+    when "sha384"
+        Digest::SHA384.hexdigest(word)
 
-rescue Interrupt
-    print "\n#{red}Terminated By User!#{rst}"
-    print "\n"
+    when "sha512"
+        Digest::SHA512.hexdigest(word)
+
+
+
+    else 
+       puts "\n#{red}Error: Invalid Hash Type!#{rst}"
+       puts "\n#{grn}Type#{rst} #{ylw}'help'#{rst} #{grn}for options.#{rst}"
+       return
     end
+
+           if hash_type == hash
+            puts "\n#{grn}Password Found:#{rst} #{ylw} #{word} #{rst}"
+            return word
+           
+          end   
+        end
+    end
+    puts "\n#{red}Password Not Found!#{rst}"
+end
+   
+  
+
