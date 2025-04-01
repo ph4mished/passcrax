@@ -1,21 +1,59 @@
 #!/usr/bin/env ruby
 
-def help()
-        ylw = "\e[33m"
-        grn = "\e[32m"
-        red = "\e[31m"
-        blu = "\e[34m"
-        rst = "\e[0m"
-        bcyn = "\e[1;36m"
-puts "\n\t\t#{bcyn}Available Commands:#{rst}"
-puts "#{blu}set hash <value>#{rst} - #{grn}Set hash (eg.,21232f297a57a5a743894a0e4a801fc3#{rst} )"
-puts "#{blu}set hashtype <value>#{rst}   -#{grn} Set hashtype (e.g. md5)#{rst}"
-puts "#{blu}run#{rst}             - #{grn}Execute password cracking#{rst}"
-puts "#{blu}status#{rst}             - #{grn}Show current settings#{rst}"
-puts "#{blu}exit#{rst}#{grn} or#{rst}#{blu} Ctrl+c#{rst}               - #{grn}Quit program#{rst}"
-puts "#{blu}hashid <value>#{rst}     - #{grn}Identify hash type (eg. hashid 49f68a5c8493ec2c0bf489821c21fc3b )#{rst}"
-puts "#{blu}help#{rst}               - #{grn}Show this help#{rst}"
+require 'digest'
 
-puts "\n\t\t#{bcyn}Hash Type Values To Use:#{rst}"
-puts "#{grn}set hashtype <value>     - #{blu}values = md5, sha1, sha256, sha384, sha512#{rst}"
+def pass_crack(hash, hashtype)
+   grn = "\e[32m"
+   blu = "\e[34m"
+   ylw = "\e[33m"
+   red = "\e[31m"
+   rst = "\e[0m"
+
+wordlist_dir = "Wordlist/"            
+wordlist_files = Dir.glob("#{wordlist_dir}*.txt")
+            if wordlist_files.empty?          
+            puts "\n#{red}Error: No Files Found In #{wordlist_dir}#{rst}"
+           return
+           end
+            wordlist_files.each do |file|
+               puts "\n#{blu}Scanning File: #{file}...#{rst}"
+               File.foreach(file) do |word|
+               word.chomp!
+
+
+   hash_type = case hashtype
+    when "md5"
+        Digest::MD5.hexdigest(word)
+    
+    when "sha1"
+        Digest::SHA1.hexdigest(word)
+
+    when "sha256"
+        Digest::SHA256.hexdigest(word)
+
+    when "sha384"
+        Digest::SHA384.hexdigest(word)
+
+    when "sha512"
+        Digest::SHA512.hexdigest(word)
+
+
+
+    else 
+       puts "\n#{red}Error: Invalid Hash Type!#{rst}"
+       puts "\n#{grn}Type#{rst} #{ylw}'help'#{rst} #{grn}for options.#{rst}"
+       return
+    end
+
+           if hash_type == hash
+            puts "\n#{grn}Password Found:#{rst} #{ylw} #{word} #{rst}"
+            return word
+           
+          end   
+        end
+    end
+    puts "\n#{red}Password Not Found!#{rst}"
 end
+   
+  
+
