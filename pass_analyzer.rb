@@ -22,9 +22,7 @@ def find_hash(hash)
     ylw = "\e[33m"
     red = "\e[31m"
     rst = "\e[0m"
-
-puts "\n#{blu}Enter Hash String For Analysis:#{rst}"
-hash = gets.chomp.strip
+    
 
   if hash.nil? || hash.empty?
       return "#{red}Empty Input!#{rst}"
@@ -38,7 +36,7 @@ hash = gets.chomp.strip
   "#{red}Unknown Hash Format!#{rst}"
 end
 
-def pass_analyze()
+def pass_analyze(hash)
    grn = "\e[32m"
     blu = "\e[34m"
     ylw = "\e[33m"
