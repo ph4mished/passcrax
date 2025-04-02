@@ -8,7 +8,7 @@
     <h1>PassCrax</h1>
     <p><em>A lightweight password-cracking tool for educational purposes</em></p>
 
-    <h2>Overview</h2>
+<h2>Overview</h2>
     <p>PassCrax is a personal project I developed in my early days of learning penetration testing. While more robust tools exist in the password-cracking space, I built this to deeply understand how hash cracking works. It started as a simple wordlist-based cracker and evolved to include additional features over time.</p>
 
     <h2>Features</h2>
