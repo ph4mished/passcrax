@@ -43,31 +43,31 @@ begin
     when "help"
          help()
 
-    when /^-hash (.+)$/i
+    when /^set hash (.+)$/i
     #[1] is addded so hash id will be able to capture input
-        hash = input.match(/^-hash (.+)$/i)[1]
+        hash = input.match(/^set hash (.+)$/i)[1]
         puts "\n#{grn}Hash set to:#{rst} #{ylw} #{hash}#{rst}"
 
         
-    when /^-htype (.+)$/i
-        hashtype = input.match(/^-htype (.+)$/i)[1]
+    when /^set hashtype (.+)$/i
+        hashtype = input.match(/^set hashtype (.+)$/i)[1]
         puts "\n#{grn}Hash Type set to:#{rst} #{ylw} #{hashtype}#{rst}"
 
-    when /^-hid (.+)$/i
-                   hash = input.match(/^-hid (.+)$/i)[1]
+    when /^hashid (.+)$/i
+                   hash = input.match(/^hashid (.+)$/i)[1]
                   pass_analyze(hash)
 
-     when /^-m (.+)$/i
-                  mode = input.match(/^-m (.+)$/i)[1]
+     when /^set mode (.+)$/i
+                  mode = input.match(/^set mode (.+)$/i)[1]
                   puts "\n#{grn}Mode set to:#{rst} #{ylw} #{mode}#{rst}"
 
     
-    when /^-s (\d+)$/i
-                  start_len = input.match(/^-s (\d+)$/i)[1]
+    when /^start (\d+)$/i
+                  start_len = input.match(/^start (\d+)$/i)[1]
                   puts "\n#{grn}Brute Start Length set to:#{rst} #{ylw} #{start_len}#{rst}"
 
-    when /^-e (\d+)$/i
-                  end_len = input.match(/^-e (\d+)$/i)[1]
+    when /^end (\d+)$/i
+                  end_len = input.match(/^end (\d+)$/i)[1]
                puts "\n#{grn}Brute End Length set to:#{rst} #{ylw} #{end_len}#{rst}"
 
                       
