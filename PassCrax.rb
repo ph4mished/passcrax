@@ -20,7 +20,6 @@ begin
   end_len = nil
   
 
-#Interactive mode
   loop do 
     #Display current status
     puts "\n#{bcyn}CURRENT SETTINGS#{rst}"
