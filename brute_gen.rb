@@ -40,9 +40,9 @@ def brute_gen(hash, hashtype, start_len, end_len)
             if hash_type == hash
                 puts "\n#{grn}Password Found:#{rst} #{ylw} #{chars} #{rst}"
                             return chars
+            end
                    chars = chars.next
                               end
                             end
                   puts "\n#{red}Password Not Found!#{rst}"
-end
 end
