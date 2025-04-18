@@ -42,7 +42,7 @@
 <h2>Installation & Usage</h2>
     <p><em>git clone https://github.com/TAUREAN312/PassCrax.git<br>
     cd PassCrax<br>
-    go build main.go
+    go build main.go<br>
     ./main</em></p>
 
 <h2>Contribution & License</h2>
