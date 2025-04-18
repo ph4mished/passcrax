@@ -19,6 +19,9 @@
         <strong>Automatic Wordlist Selection</strong> - Scans all wordlists in the <code>/Wordlist</code> directory without manual selection.
     </div>
     <div class="feature">
+        <strong>Auto Mode</strong> - Auto mode has being added making the cracking modes three (dict, brute, auto). Auto is made to smoothly transit from wordlist cracking to bruteforce if wordlist cracking wasn't successful. This transition is without human intervention.
+    </div>
+    <div class="feature">
         <strong>Multiple Attack Modes</strong> - Supports both <strong>wordlist attacks</strong> and <strong>brute-force</strong> methods.
     </div>
 
