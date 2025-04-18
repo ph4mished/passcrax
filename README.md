@@ -42,7 +42,8 @@
 <h2>Installation & Usage</h2>
     <p><em>git clone https://github.com/TAUREAN312/PassCrax.git<br>
     cd PassCrax<br>
-    ruby PassCrax.rb</em></p>
+    go build main.go
+    ./main</em></p>
 
 <h2>Contribution & License</h2>
     <ul>
