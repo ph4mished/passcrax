@@ -17,7 +17,7 @@ const (
 	rst = "\033[0m"
 )
 
-var charset = []rune("abcdefghijklmnopqrstuvwxyz")
+var charset = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;!?:'*#€@_&-+()/✓[]}{><∆§×÷=°^¢$¥£~|•√π`")
 
 func BruteGen(hash string, hashtype string, start_len int, end_len int) string {
 	if start_len < 1 || end_len < 1 || start_len > end_len {
@@ -86,5 +86,4 @@ func BruteGen(hash string, hashtype string, start_len int, end_len int) string {
 
 	fmt.Printf("\n%sPassword Not Found!%s\n", red, rst)
 	return ""
-                      }
-                      
+}
