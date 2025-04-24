@@ -1,3 +1,3 @@
-module github.com/TAUREAN312/PassCrax
+module PassCrax
 
 go 1.24.0
