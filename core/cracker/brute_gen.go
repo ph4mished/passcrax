@@ -1,34 +1,37 @@
 package cracker
 
+import "PassCrax/core/utils"
+
 import (
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
-	"encoding/hex"
 	"fmt"
 )
 
 const (
+    borng = "\033[1;38;5;208m"
+    bgrn = "\033[1;32m"
+	bblu = "\033[1;34m"
+	bred = "\033[1;31m"
+	bylw = "\033[1;33m"
 	grn = "\033[32m"
 	blu = "\033[34m"
 	ylw = "\033[33m"
 	red = "\033[31m"
+	orng = "\033[38;5;208m"
 	rst = "\033[0m"
 )
 
 var charset = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;!?:'*#€@_&-+()/✓[]}{><∆§×÷=°^¢$¥£~|•√π`")
 
-func BruteGen(hash string, hashtype string, start_len int, end_len int) string {
-	if start_len < 1 || end_len < 1 || start_len > end_len {
-		fmt.Printf("\n%sError: Invalid Length Parameters%s", red, rst)
+func BruteGen(targetHash string, hashtype string, startLen int, endLen int) string {
+	if startLen < 1 || endLen < 1 || startLen > endLen {
+		fmt.Printf("\n%sError: Invalid Length Parameters: Minimum length cannot be '0' !%s", bred, rst)
 		return ""
 	}
 
-	fmt.Printf("\n%sBrute-Forcing From Length %d To %d...%s\n", ylw, start_len, end_len, rst)
+	fmt.Printf("\n%sBrute-Forcing From Length %d To %d...%s\n", bylw, startLen, endLen, rst)
 
-	for length := start_len; length <= end_len; length++ {
-		fmt.Printf("%sTrying Length: %d%s\n", blu, length, rst)
+	for length := startLen; length <= endLen; length++ {
+		fmt.Printf("%sTrying Length: %d%s\n", bblu, length, rst)
 
 		total := 1
 		for i := 0; i < length; i++ {
@@ -36,54 +39,28 @@ func BruteGen(hash string, hashtype string, start_len int, end_len int) string {
 		}
 
 		for i := 0; i < total; i++ {
-			word := make([]rune, length)
+			text := make([]rune, length)
 			n := i
 			for j := length - 1; j >= 0; j-- {
-				word[j] = charset[n%len(charset)]
+				text[j] = charset[n%len(charset)]
 				n /= len(charset)
 			}
 
-			input := string(word)
-			var hash_type string
-
-			switch hashtype {
-			case "md5":
-				data := md5.Sum([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha1":
-				data := sha1.Sum([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha224":
-				data := sha256.Sum224([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha256":
-				data := sha256.Sum256([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha384":
-				data := sha512.Sum384([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha512":
-				data := sha512.Sum512([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha512_224":
-				data := sha512.Sum512_224([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			case "sha512_256":
-				data := sha512.Sum512_256([]byte(input))
-				hash_type = hex.EncodeToString(data[:])
-			default:
-				fmt.Printf("\n%sError: Invalid Hash Type: %s%s", red, hashtype, rst)
-				fmt.Printf("\n%sType%s %s'help'%s %sfor options.%s", grn, rst, ylw, rst, grn, rst)
+			word := string(text)
+			hash_type, err := utils.HashFormats(word, hashtype)
+			if err != nil {
+				fmt.Printf("\n%sError: %s%s",
+					red, err, rst)
 				return ""
 			}
 
-			if hash_type == hash {
-				fmt.Printf("\n%sPassword Found:%s %s%s%s\n", grn, rst, ylw, input, rst)
-				return input
+			if hash_type == targetHash {
+				fmt.Printf("\n%sPassword Found:%s %s%s%s\n", bgrn, rst, borng, word, rst)
+				return word
 			}
 		}
 	}
 
-	fmt.Printf("\n%sPassword Not Found!%s\n", red, rst)
+	fmt.Printf("\n%sPassword Not Found!%s\n", bred, rst)
 	return ""
 }
