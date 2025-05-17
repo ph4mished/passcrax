@@ -7,17 +7,17 @@ import (
 )
 
 const (
-    borng = "\033[1;38;5;208m"
-    bgrn = "\033[1;32m"
-	bblu = "\033[1;34m"
-	bred = "\033[1;31m"
-	bylw = "\033[1;33m"
-	grn = "\033[32m"
-	blu = "\033[34m"
-	ylw = "\033[33m"
-	red = "\033[31m"
-	orng = "\033[38;5;208m"
-	rst = "\033[0m"
+	borng = "\033[1;38;5;208m"
+	bgrn  = "\033[1;32m"
+	bblu  = "\033[1;34m"
+	bred  = "\033[1;31m"
+	bylw  = "\033[1;33m"
+	grn   = "\033[32m"
+	blu   = "\033[34m"
+	ylw   = "\033[33m"
+	red   = "\033[31m"
+	orng  = "\033[38;5;208m"
+	rst   = "\033[0m"
 )
 
 var charset = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;!?:'*#€@_&-+()/✓[]}{><∆§×÷=°^¢$¥£~|•√π`")

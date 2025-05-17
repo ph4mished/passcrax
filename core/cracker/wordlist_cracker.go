@@ -38,7 +38,7 @@ func PassCrack(targetHash string, hashtype string) string {
 			hash_type, err := utils.HashFormats(word, hashtype)
 			if err != nil {
 				fmt.Printf("\n%sError: %s%s", red, err, rst)
-                file.Close()
+				file.Close()
 				return ""
 			}
 

@@ -3,18 +3,18 @@ package utils
 import "fmt"
 
 const (
-    bcyn = "\033[1;36m"
-	bgrn = "\033[1;32m"
-	bblu = "\033[1;34m"
-	bred = "\033[1;31m"
+	bcyn  = "\033[1;36m"
+	bgrn  = "\033[1;32m"
+	bblu  = "\033[1;34m"
+	bred  = "\033[1;31m"
 	borng = "\033[1;38;5;208m"
-	bylw = "\033[1;33m"
-	grn = "\033[32m"
-	blu = "\033[34m"
-	ylw = "\033[33m"
-	red = "\033[31m"
-	orng = "\033[38;5;208m"
-	rst = "\033[0m"
+	bylw  = "\033[1;33m"
+	grn   = "\033[32m"
+	blu   = "\033[34m"
+	ylw   = "\033[33m"
+	red   = "\033[31m"
+	orng  = "\033[38;5;208m"
+	rst   = "\033[0m"
 )
 
 func Help() {
@@ -32,7 +32,6 @@ func Help() {
 	fmt.Printf("\n%sset mode <value>%s               - %sThis command is used to set cracking mode to {brute (bruteforce), dict (wordlist cracking), or auto (bruteforce + wordlist cracking)}%s", orng, rst, grn, rst)
 	fmt.Printf("\n%sset hashfile <file>%s            -%sThis command accepts the name of the file or filepath that contains the hashes. (eg. set hashfile hashed.txt) or (eg. set hashfile /home/my_files/hashed.txt%s", orng, rst, grn, rst)
 	fmt.Printf("\n%sset outputfile <file>%s               - %sThis command accepts the name of the file to which the cracked and uncracked hashes will be saved.%s \n\n %s*The output file is automatically named and created after the hash file. So there's no need to use this command, except the user wants to name the output file based on their choice%s", orng, rst, grn, rst, ylw, rst)
-
 
 	fmt.Printf("\n\t\t\t%sValues To Use:%s", bcyn, rst)
 	fmt.Printf("\n%s set hashtype <value>     - %ssupported values = md4, md5, sha1, sha224, sha256, sha384, sha512, sha512_224, sha512_256, ripemd160, adler32, crc32, crc64, blake2b, blake2s, fnv1_32, fnv1_64, fnv1a_32, fnv1a_64%s", grn, orng, rst)
