@@ -55,5 +55,3 @@
     <p>This was a learning project—not meant to replace tools like Hashcat or John the Ripper. If you're exploring password security, feel free to test and contribute!</p>
 </body>
 </html>
-# Testing push
-# Testing push
