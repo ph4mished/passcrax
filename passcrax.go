@@ -42,8 +42,8 @@ var (
 	reHashid      = regexp.MustCompile(`(?i)^hashid\s+(.+)$`)
 	reSetMode     = regexp.MustCompile(`(?i)^set\s+mode\s+(.+)$`)
 	reRange       = regexp.MustCompile(`^(?i)set\srange\s\d+\s*-\s*\d+$`)
-	reSetInput    = regexp.MustCompile(`^(?i)set\s+hashfile\s+(.+)$`)
-	reSetOutput   = regexp.MustCompile(`^(?i)set\s+outputfile\s+(.+)$`)
+	reSetInput    = regexp.MustCompile(`^(?i)load\s+hashfile\s+(.+)$`)
+	reSetOutput   = regexp.MustCompile(`^(?i)load\s+outputfile\s+(.+)$`)
 )
 
 var targetHash, hashtype, mode, hashFile, outputFile string
@@ -68,8 +68,8 @@ func Status() {
 
 func FileStatus() {
 	fmt.Printf("\n%sCURRENT FILE HASH SETTINGS%s", bcyn, rst)
-	fmt.Printf("\n%sHash File%s: %s%s%s", grn, rst, ylw, ifEmpty(hashFile, "Not Set"), rst)
-	fmt.Printf("\n%sOutput File%s: %s%s%s", grn, rst, ylw, ifEmpty(outputFile, "Not Set"), rst)
+	fmt.Printf("\n%sHash File%s: %s%s%s", grn, rst, ylw, ifEmpty(hashFile, "Not Loaded"), rst)
+	fmt.Printf("\n%sOutput File%s: %s%s%s", grn, rst, ylw, ifEmpty(outputFile, "Not Loaded"), rst)
 	fmt.Printf("\n%sHash Type%s: %s%s%s", grn, rst, ylw, ifEmpty(hashtype, "Not Set"), rst)
 	fmt.Printf("\n%sMode%s: %s%s%s", grn, rst, ylw, ifEmpty(mode, "Not Set"), rst)
 	fmt.Printf("\n%sBrute Min Length%s: %s%d %s", grn, rst, ylw, startLen, rst)
