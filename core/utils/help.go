@@ -30,11 +30,11 @@ func Help() {
 	fmt.Printf("\n%shelp%s                           - %sThis command serves as a guide to users%s", orng, rst, grn, rst)
 	fmt.Printf("\n%sset range <min-max>%s      -%sThis command accepts brute force start and end (minimum and maximum) numbers. That is the length of words bruteforce begins and ends with. (eg. set range 4-6)%s", orng, rst, grn, rst)
 	fmt.Printf("\n%sset mode <value>%s               - %sThis command is used to set cracking mode to {brute (bruteforce), dict (wordlist cracking), or auto (bruteforce + wordlist cracking)}%s", orng, rst, grn, rst)
-	fmt.Printf("\n%sset hashfile <file>%s            -%sThis command accepts the name of the file or filepath that contains the hashes. (eg. set hashfile hashed.txt) or (eg. set hashfile /home/my_files/hashed.txt%s", orng, rst, grn, rst)
-	fmt.Printf("\n%sset outputfile <file>%s               - %sThis command accepts the name of the file to which the cracked and uncracked hashes will be saved.%s \n\n %s*The output file is automatically named and created after the hash file. So there's no need to use this command, except the user wants to name the output file based on their choice%s", orng, rst, grn, rst, ylw, rst)
+	fmt.Printf("\n%sload hashfile <filepath>%s            -%sThis command accepts the filepath that contains the hashes. (eg. load hashfile /home/my_files/hashed.txt)%s", orng, rst, grn, rst)
+	fmt.Printf("\n%sload outputfile <filepath>%s               - %sThis command accepts the filepath to which the cracked and uncracked hashes will be saved.%s \n\n %s*The output file is automatically named and created after the hash file. So there's no need to use this command, except the user wants to name the output file based on their choice%s", orng, rst, grn, rst, ylw, rst)
 
 	fmt.Printf("\n\t\t\t%sValues To Use:%s", bcyn, rst)
-	fmt.Printf("\n%s set hashtype <value>     - %ssupported values = md4, md5, sha1, sha224, sha256, sha384, sha512, sha512_224, sha512_256, ripemd160, adler32, crc32, crc64, blake2b, blake2s, fnv1_32, fnv1_64, fnv1a_32, fnv1a_64%s", grn, orng, rst)
+	fmt.Printf("\n%s set hashtype <value>     - %ssupported values = md5, sha1, sha224, sha256, sha384, sha512, sha512_224, sha512_256, adler32, crc32, crc64, fnv1_32, fnv1_64, fnv1a_32, fnv1a_64%s", grn, orng, rst)
 	fmt.Printf("\n%sset mode <value>     - %ssupported values = brute, dict, auto%s", grn, orng, rst)
 
 	fmt.Printf("\n\n%s*Only Brute Mode requires minimum and maximum length (range)%s\n", ylw, rst)
