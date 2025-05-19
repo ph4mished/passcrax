@@ -12,7 +12,7 @@ import (
 // to accept full spellings so that no partial
 // spellings are accepted.
 func CheckValidHashType(hashtype string) string {
-	valid_ones := []string{"md4", "md5", "sha1", "sha224", "sha256", "sha384", "sha512", "sha512_224", "sha512_256", "ripemd160", "adler32", "blake2b", "blake2s", "crc32", "crc64", "fnv1_32", "fnv1_64", "fnv1a_32", "fnv1a_64"}
+	valid_ones := []string{"md5", "sha1", "sha224", "sha256", "sha384", "sha512", "sha512_224", "sha512_256", "adler32", "crc32", "crc64", "fnv1_32", "fnv1_64", "fnv1a_32", "fnv1a_64"}
 	together := strings.Join(valid_ones, ", ")
 	checkTrue := strings.Contains(together, hashtype)
 
