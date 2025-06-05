@@ -9,7 +9,7 @@
     <p><em>A lightweight password-cracking tool for educational purposes</em></p>
 
 <h2>Overview</h2>
-    <p>PassCrax is a personal project I developed in my early days of learning penetration testing. While more robust tools exist in the password-cracking space, I built this to deeply understand how hash cracking works. It started as a simple wordlist-based cracker and evolved to include additional features over time.</p>
+    <p>passcrax is a personal project I developed in my early days of learning penetration testing. While more robust tools exist in the password-cracking space, I built this to deeply understand how hash cracking works. It started as a simple wordlist-based cracker and evolved to include additional features over time.</p>
 
 <h2>Features</h2>
     <div class="feature">
@@ -40,7 +40,7 @@
     </div>
 
 <h2>Installation & Usage</h2>
-    <p><em>git clone https://github.com/TAUREAN312/PassCrax.git<br>
+    <p><em>git clone https://github.com/ph4mished/passcrax.git<br>
     cd PassCrax<br>
     go build main.go<br>
     ./main</em></p>
