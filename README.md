@@ -57,6 +57,6 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
     </ul>
 
 <h2>Why PassCrax?</h2>
-    <p>This was a learning project - to make hash cracking easier for ctf and beginners alike. If you're exploring password security, feel free to test and contribute!</p>
+    <p>This is a learning project - to make hash cracking easier for ctf and beginners alike. If you're exploring password security, feel free to test and contribute!</p>
 </body>
 </html>
