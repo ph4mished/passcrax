@@ -1,14 +1,10 @@
 package rules
 
-import(
-//"passcrax/core/utils"
-)
 import (
  "fmt"
  "os"
  "bufio"
  "strings"
- //"path/filepath"
  )
  
  const (
@@ -24,60 +20,6 @@ import (
 	orng = "\033[38;5;208m"
 	rst = "\033[0m"
 )
-
-
-/*func DictRule(targetHash string, hashtype string, ruleFile string)string{
-var hash_type string
-var err error
-//the hardcoded wordlist makes it brittle
-var word string
-	var wordlist_dir = "Wordlists/"
-	wordlist_files, err := filepath.Glob(filepath.Join(wordlist_dir, "*.txt"))
-	if err != nil {
-		fmt.Printf("\n%s[!] Error Scanning Wordlist Directory: %v %s\n", red, err, rst)
-		return ""
-	}
-	if len(wordlist_files) == 0 {
-     	fmt.Printf("\n%s[!] Error: No Files Found In %s%s\n", red, wordlist_dir, rst)
-		return ""
-	}
-	for _, filename := range wordlist_files {
-
-		fmt.Printf("\n%s[~] Scanning File: %s...%s", bblu, filename, rst)
-		file, err := os.Open(filename)
-		if err != nil {
-			fmt.Printf("\n%s[!] Error: File Cannot Be Opened!%s\n", red, rst)
-			continue
-		}
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			word = scanner.Text()
-			word = strings.TrimSpace(word)
-            rule_words := FindRuleWord(ruleFile, word)
-            for _, rule_word := range rule_words{
-            fmt.Println(rule_word)
-            hash_type, err = utils.HashFormats(rule_word, hashtype)
-			if err != nil {
-				fmt.Printf("\n%s[!] Error: %s%s", red, err, rst)
-                file.Close()
-				return ""
-			}
-			if hash_type == targetHash {
-				fmt.Printf("\n%s[~] Password Found:%s %s%s%s\n", bgrn, rst, borng, rule_word, rst)
-				file.Close()
-				return rule_word
-			}
-			}
-            }
-
-		if err := scanner.Err(); err != nil {
-			fmt.Printf("\n%sError Reading File: %v %s\n", red, err, rst)
-			}
-		file.Close()
-}
-fmt.Printf("\n%s[!] Password Not Found!%s\n", bred, rst)
-	return ""
-}*/
 
 
 
