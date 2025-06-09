@@ -3,15 +3,8 @@ import (
   "strconv"
     "strings"
 )
-//for this one a lexer, parser and ast is required else, things are gonna get complicated
-//note that sometimes a command wont be the always be the first. else the script will assume the next command is a strings. such as 'c $s^sad'  after capitalization the rest are ignore.
-//I'll come back to it
-
-//there will be improvisations where the parser and rule engine will support more commands on a line
 
 func LeetSpeak(ruleString string, word string)string{
-     //if the string that follows is "s" it might be perceived as a command and it will be skipped
-  //this isnt good
     var replace string
     split := strings.Split(ruleString, "")
     from := split[1]
