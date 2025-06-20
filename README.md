@@ -6,7 +6,7 @@
 </head>
   <body>
     <h1>PassCrax</h1>
-    <p><em>A lightweight and simple password-cracking tool for educational purposes</em></p>
+    <p><em>A lightweight and simple password-cracking tool for educational purposes and CTFs.</em></p>
 
 <h2>Overview</h2>
     <p>Passcrax is a hash cracking tool which is built to be interactive, easier to use and beginner friendly. This tool expects little from the user and does much in the backend.
@@ -38,7 +38,7 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
         <ul>
             <li><strong>Only crack hashes you own.</strong></li>
             <li><strong>Unauthorized hacking is illegal</strong> (violates laws like the CFAA, GDPR, Computer Misuse Act, etc.).</li>
-            <li><strong>Intended for ethical hacking, pentesting, and educational research only.</strong></li>
+            <li><strong>Intended for ethical hacking, pentesting, CTF, and educational research only.</strong></li>
         </ul>
         
 <blockquote><strong>"All risks are borne by the user. Misuse will result in legal consequences."</strong></blockquote>
