@@ -19,7 +19,7 @@ const (
 
 func Banner() {
 	fmt.Printf("%s################################################################################%s\n", bcyn, rst)
-	fmt.Printf("%s                               PassCrax v2.2.1%s\n", borng, rst)
+	fmt.Printf("%s                               PassCrax v2.2.2%s\n", borng, rst)
 	fmt.Printf("%s                                by ph4mished%s\n", borng, rst)
 	fmt.Printf("%s                             Copyright (C) 2025%s\n", borng, rst)
 	fmt.Printf("%s             PassCrax is a simpler, and interactive hash cracker%s\n", bblu, rst)
