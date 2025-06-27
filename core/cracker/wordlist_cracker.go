@@ -1,59 +1,92 @@
 package cracker
 
-import "PassCrax/core/utils"
-
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
+	"passcrax/core/rules"
+	"passcrax/core/utils"
+	//"passcrax/core/file"
 )
 
-func PassCrack(targetHash string, hashtype string) string {
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+	"time"
+	"unicode"
+)
 
-	var wordlist_dir = "Wordlist/"
+const (
+	borng = "\033[1;38;5;208m"
+	bgrn  = "\033[1;32m"
+	bblu  = "\033[1;34m"
+	bred  = "\033[1;31m"
+	bylw  = "\033[1;33m"
+	grn   = "\033[32m"
+	blu   = "\033[34m"
+	ylw   = "\033[33m"
+	red   = "\033[31m"
+	orng  = "\033[38;5;208m"
+	rst   = "\033[0m"
+)
+
+var hash_type string
+var err error
+
+func PassCrack(dict_dir string, targetHash string, hashtype string, rulefile string) string {
+	var wordlist_dir string
+	if len(dict_dir) != 0 {
+		wordlist_dir = dict_dir
+	} else {
+		wordlist_dir = "Wordlists/"
+	}
 	wordlist_files, err := filepath.Glob(filepath.Join(wordlist_dir, "*.txt"))
 	if err != nil {
-		fmt.Printf("\n%sError Scanning Wordlist Directory: %v %s\n", red, err, rst)
+		fmt.Printf("\n%s[!] Error Scanning Wordlist Directory: %v %s\n", bred, err, rst)
 		return ""
 	}
 	if len(wordlist_files) == 0 {
-		fmt.Printf("\n%sError: No Files Found In %s%s\n", red, wordlist_dir, rst)
+		fmt.Printf("\n%s[!] Error: No Files Found In %s%s\n", bred, wordlist_dir, rst)
 		return ""
 	}
-	for _, filename := range wordlist_files {
+	for fileNum, filename := range wordlist_files {
+		startTime := time.Now()
 
-		fmt.Printf("\n%sScanning File: %s...%s", bblu, filename, rst)
-		file, err := os.Open(filename)
-		if err != nil {
-			fmt.Printf("\n%sError: File Cannot Be Opened!%s\n", red, rst)
-			continue
-		}
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			word := scanner.Text()
-			word = strings.TrimSpace(word)
-
-			hash_type, err := utils.HashFormats(word, hashtype)
+		results := utils.FileLaunch(filename, 0, 0644)
+		for _, word := range results {
+			hash_type, err = utils.HashFormats(word, hashtype)
 			if err != nil {
-				fmt.Printf("\n%sError: %s%s", red, err, rst)
-				file.Close()
+				fmt.Printf("\n%s[!] Error: %s%s", bred, err, rst)
 				return ""
 			}
-
-			if hash_type == targetHash {
-				fmt.Printf("\n%sPassword Found:%s %s%s%s\n", bgrn, rst, borng, word, rst)
-				file.Close()
-				return word
+			for _, hashChar := range targetHash {
+				if unicode.IsUpper(hashChar) {
+					altHashtype := strings.ToUpper(hash_type)
+					if altHashtype == targetHash {
+						return word
+					}
+				}
+				if hash_type == targetHash {
+					return word
+				}
 			}
-		}
 
-		if err := scanner.Err(); err != nil {
-			fmt.Printf("\n%sError Reading File: %v %s\n", red, err, rst)
+			if rulefile != "" {
+				rule_words := rules.FindRuleWord(rulefile, word)
+				for _, rule_word := range rule_words {
+					hash_type, err := utils.HashFormats(rule_word, hashtype)
+					if err != nil {
+						fmt.Printf("\n%s[!] Error: %s%s", bred, err, rst)
+						return ""
+					}
+
+					if hash_type == targetHash {
+						return rule_word
+					}
+				}
+			}
+
 		}
-		file.Close()
+		currentFileNum := fileNum + 1
+		utils.PrintProgress(currentFileNum, len(wordlist_files), startTime)
 	}
-	fmt.Printf("\n%sPassword Not Found!%s\n", bred, rst)
 	return ""
 }
