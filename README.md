@@ -50,7 +50,7 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
 
 <h2>Installation & Usage</h2>
     <p><em>git clone https://github.com/ph4mished/passcrax.git<br>
-    cd PassCrax<br>
+    cd passcrax<br>
     go build passcrax.go<br>
     cd passcrax<br>
     go build <br>
