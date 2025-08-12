@@ -16,6 +16,7 @@ func FileRead(hashFile string) ([]string, []string) {
 	if err != nil {
 		fmt.Printf("%s[!] Error: Cannot open %s%s", bred, hashFile, rst)
 	}
+	defer filename.Close()
 	if _, err = os.Stat(hashFile); errors.Is(err, fs.ErrNotExist) {
 		fmt.Printf("\n%s[!] Error: %s does not exist%s\n", bred, hashFile, rst)
 	}
