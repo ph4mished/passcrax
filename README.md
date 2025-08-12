@@ -48,7 +48,11 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
 <blockquote><strong>"All risks are borne by the user. Misuse will result in legal consequences."</strong></blockquote>
     </div>
 
-<h2>Installation & Usage</h2>
+<div class="notice">
+    <strong>👋 Hello guys</strong> - Please checkout my hash identifier <a href="https://github.com/ph4mished/hashpeek" target="_blank">"hashpeek"</a>.
+</div>
+
+    <h2>Installation & Usage</h2>
     <p><em>git clone https://github.com/ph4mished/passcrax.git<br>
     cd passcrax<br>
     go build passcrax.go<br>
@@ -60,6 +64,7 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
         <li><strong>Open to feedback</strong> (You can please report issues or suggest improvements).</li>
         <li><strong>Educational use is highly encouraged</strong></li>
     </ul>
+
 
 <h2>Why PassCrax?</h2>
     <p>This was a learning project - to make hash cracking easier for ctf and beginners alike. If you're exploring password security, feel free to test and contribute!</p>
