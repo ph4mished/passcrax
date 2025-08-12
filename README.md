@@ -48,11 +48,12 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
 <blockquote><strong>"All risks are borne by the user. Misuse will result in legal consequences."</strong></blockquote>
     </div>
 
-<div class="notice">
+<p><div class="notice">
     <strong>👋 Hello guys</strong> - Please checkout my hash identifier <a href="https://github.com/ph4mished/hashpeek" target="_blank">"hashpeek"</a>.
-</div>
+</div></p>
 
-    <h2>Installation & Usage</h2>
+    
+<h2>Installation & Usage</h2>
     <p><em>git clone https://github.com/ph4mished/passcrax.git<br>
     cd passcrax<br>
     go build passcrax.go<br>
