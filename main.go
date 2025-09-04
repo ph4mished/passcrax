@@ -1,18 +1,6 @@
 package main
 
-//above all the code will be kept simple and concise
 import (
-	"passcrax/core/analyzer"
-	"passcrax/core/cracker"
-	"passcrax/core/cracker/brute"
-	"passcrax/core/file"
-	"passcrax/core/utils"
-	"passcrax/core/utils/cond"
-	"passcrax/core/utils/help"
-)
-
-import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -23,27 +11,103 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/chzyer/readline"
+	"github.com/fatih/color"
+	"passcrax/core/analyzer"
+	"passcrax/core/crack"
+	"passcrax/core/file"
+	"passcrax/core/utils"
+	"passcrax/core/utils/cond"
+	"passcrax/core/utils/help"
 )
 
-const (
-	bcyn  = "\033[1;36m"
-	borng = "\033[1;38;5;208m"
-	bgrn  = "\033[1;32m"
-	bblu  = "\033[1;34m"
-	bred  = "\033[1;31m"
-	bylw  = "\033[1;33m"
-	grn   = "\033[32m"
-	blu   = "\033[34m"
-	ylw   = "\033[33m"
-	red   = "\033[31m"
-	orng  = "\033[38;5;208m"
-	rst   = "\033[0m"
+var (
+	bgrn  = color.New(color.FgGreen, color.Bold).SprintFunc()
+	bred  = color.New(color.FgRed, color.Bold).SprintFunc()
+	bblu  = color.New(color.FgBlue, color.Bold).SprintFunc()
+	bcyn  = color.New(color.FgCyan, color.Bold).SprintFunc()
+	bylw  = color.New(color.FgYellow, color.Bold).SprintFunc() // Fixed: added .SprintFunc()
+	borng = color.New(color.FgHiYellow, color.Bold).SprintFunc()
+	orng  = color.New(color.FgHiYellow).SprintFunc()
+	grn   = color.New(color.FgGreen).SprintFunc()
+	red   = color.New(color.FgRed).SprintFunc()
+	blu   = color.New(color.FgBlue).SprintFunc()
+	cyn   = color.New(color.FgCyan).SprintFunc()
+	ylw   = color.New(color.FgYellow).SprintFunc()
 )
+
+func Status() {
+	fmt.Println(bcyn("\nCURRENT HASH SETTINGS"))
+	fmt.Println(grn("Hash"), ":", ylw(ifEmpty(targetHash, "Not Set")))
+	fmt.Println(grn("Hash Type"), ":", ylw(ifEmpty(hashtype, "Not Set")))
+	fmt.Println(grn("Rule File"), ":", ylw(ifEmpty(ruleFile, "Not Set {Optional}")))
+	fmt.Println(grn("Mode"), ":", ylw(ifEmpty(mode, "Not Set")))
+	if mode == "brute" || mode == "auto" {
+		fmt.Println(grn("Brute Charset"), ":", ylw(ifEmpty(charset, "Not Set")))
+		fmt.Println(grn("Brute Min Length"), ":", ylw(ifEmpty(strconv.Itoa(startLen), "Not Set")))
+		fmt.Println(grn("Brute Max Length"), ":", ylw(ifEmpty(strconv.Itoa(endLen), "Not Set")))
+	}
+	if mode == "dict" || mode == "auto" {
+		fmt.Println(grn("Dict Path"), ":", ylw(ifEmpty(dictDir, "Not Set {Optional}")))
+	}
+}
+
+func FileStatus() {
+	fmt.Println(bcyn("\nCURRENT FILE HASH SETTINGS"))
+	fmt.Println(grn("Hash File"), ":", ylw(ifEmpty(hashFile, "Not Set")))
+	fmt.Println(grn("Output File"), ":", ylw(ifEmpty(outputFile, "Not Set")))
+	fmt.Println(grn("Hash Type"), ":", ylw(ifEmpty(hashtype, "Not Set")))
+	fmt.Println(grn("Mode"), ":", ylw(ifEmpty(mode, "Not Set")))
+
+	if mode == "brute" || mode == "auto" {
+		fmt.Println(grn("Brute Charset"), ":", ylw(ifEmpty(charset, "Not Set")))
+		fmt.Println(grn("Brute Min Length"), ":", ylw(ifEmpty(strconv.Itoa(startLen), "Not Set")))
+		fmt.Println(grn("Brute Max Length"), ":", ylw(ifEmpty(strconv.Itoa(endLen), "Not Set")))
+	}
+	if mode == "dict" || mode == "auto" {
+		fmt.Println(grn("Dict Path"), ":", ylw(ifEmpty(dictDir, "Not Set {Optional}")))
+	}
+}
+
+func ifEmpty(if_full interface{}, if_null string) string {
+	if if_full == "" {
+		return if_null
+	}
+	return fmt.Sprint(if_full)
+}
+
+func CreateCompleter() *readline.PrefixCompleter {
+	return readline.NewPrefixCompleter(
+		readline.PcItem("set",
+			readline.PcItem("hash"),
+			readline.PcItem("hashtype"),
+			readline.PcItem("mode",
+			readline.PcItem("auto"),
+			readline.PcItem("brute"),
+			readline.PcItem("dict"),),
+			readline.PcItem("charset"),
+			readline.PcItem("brute-range"),
+			readline.PcItem("outputfile"),
+		),
+		readline.PcItem("load",
+			readline.PcItem("hashfile"),
+			readline.PcItem("dictdir"),
+			readline.PcItem("rulefile"),
+		),
+		readline.PcItem("identify"),
+		readline.PcItem("run"),
+		readline.PcItem("status"),
+		readline.PcItem("help"),
+		readline.PcItem("exit"),
+		readline.PcItem("quit"),
+	)
+}
 
 var (
 	reSetHash     = regexp.MustCompile(`(?i)^set\s+hash\s+(.+)$`)
 	reSetHashtype = regexp.MustCompile(`(?i)^set\s+hashtype\s+(.+)$`)
-	reHashid      = regexp.MustCompile(`(?i)^hashid\s+(.+)$`)
+	reHashid      = regexp.MustCompile(`(?i)^identify\s+(.+)$`)
 	reSetMode     = regexp.MustCompile(`(?i)^set\s+mode\s+(.+)$`)
 	reSetCharset  = regexp.MustCompile(`(?i)^set\s+charset\s+(.+)$`)
 	reBruteRange  = regexp.MustCompile(`^(?i)set\sbrute-range\s\d+\s*-\s*\d+$`)
@@ -58,56 +122,28 @@ var targetHash, hashtype, mode, hashFile, ruleFile, outputFile, dictDir, charset
 var startLen, endLen int
 var usingHashFile bool
 
-func ifEmpty(if_full, if_null string) string {
-	if if_full == "" {
-		return if_null
-	}
-	return if_full
-}
-
-func Status() {
-	fmt.Printf("\n%sCURRENT HASH SETTINGS%s", bcyn, rst)
-	fmt.Printf("\n%sHash%s: %s%s%s", grn, rst, ylw, ifEmpty(targetHash, "Not Set"), rst)
-	fmt.Printf("\n%sHash Type%s: %s%s%s", grn, rst, ylw, ifEmpty(hashtype, "Not Set"), rst)
-	fmt.Printf("\n%sRule File%s: %s%s%s", grn, rst, ylw, ifEmpty(ruleFile, "Not Set {Optional}"), rst)
-	fmt.Printf("\n%sMode%s: %s%s%s", grn, rst, ylw, ifEmpty(mode, "Not Set\n"), rst)
-	if mode == "brute" || mode == "auto" {
-		fmt.Printf("\n%sBrute Charset%s: %s%s%s", grn, rst, ylw, ifEmpty(charset, "Not Set"), rst)
-		fmt.Printf("\n%sBrute Min Length%s: %s%d%s", grn, rst, ylw, startLen, rst)
-		fmt.Printf("\n%sBrute Max Length%s: %s%d%s", grn, rst, ylw, endLen, rst)
-	}
-	if len(dictDir) != 0 && mode == "dict" || mode == "auto" {
-		fmt.Printf("\n%sDict Path%s: %s%s%s\n", grn, rst, ylw, ifEmpty(dictDir, "Not Set {Optional}"), rst)
-	}
-}
-
-func FileStatus() {
-	fmt.Printf("\n%sCURRENT FILE HASH SETTINGS%s", bcyn, rst)
-	fmt.Printf("\n%sHash File%s: %s%s%s", grn, rst, ylw, ifEmpty(hashFile, "Not Set"), rst)
-	fmt.Printf("\n%sOutput File%s: %s%s%s", grn, rst, ylw, ifEmpty(outputFile, "Not Set"), rst)
-	fmt.Printf("\n%sHash Type%s: %s%s%s", grn, rst, ylw, ifEmpty(hashtype, "Not Set"), rst)
-	fmt.Printf("\n%sMode%s: %s%s%s", grn, rst, ylw, ifEmpty(mode, "Not Set\n"), rst)
-	if mode == "brute" || mode == "auto" {
-		fmt.Printf("\n%sBrute Charset%s: %s%s%s", grn, rst, ylw, ifEmpty(charset, "Not Set"), rst)
-		fmt.Printf("\n%sBrute Min Length%s: %s%d %s", grn, rst, ylw, startLen, rst)
-		fmt.Printf("\n%sBrute Max Length%s: %s%d%s", grn, rst, ylw, endLen, rst)
-	}
-	if len(dictDir) != 0 && mode == "dict" || mode == "auto" {
-		fmt.Printf("\n%sDict Path%s: %s%s%s\n", grn, rst, ylw, ifEmpty(dictDir, "Not Set {Optional}"), rst)
-	}
-}
-
 func main() {
 
-	scanner := bufio.NewScanner(os.Stdin)
+fmt.Print("\n")
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt:       "> ",
+		HistoryFile:  "tmp/passcrax_history",
+		HistoryLimit: 1000,
+		AutoComplete: CreateCompleter(),
+		UniqueEditLine:  true,
+		HistorySearchFold: true,
+	})
+	if err != nil {
+		fmt.Println(bred("[!] Error: "), err)
+		return
+	}
+	defer rl.Close()
 
-	// Ctrl+C handling for user to exit
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-interrupt
-		fmt.Printf("\n   %sProgram Terminated!%s\n", bred, rst)
-		os.Exit(0)
+		fmt.Println(bred("\n   Program Terminated!"))
 	}()
 
 	utils.Banner()
@@ -116,15 +152,22 @@ func main() {
 	for {
 	START:
 		fmt.Print("\n> ")
-		//_, err :=
-		scanner.Scan()
-
-		input := strings.TrimSpace(scanner.Text())
+      input, err := rl.Readline()
+      
+		if err != nil {
+		    if err == readline.ErrInterrupt {
+		        fmt.Println(bred("\n   Program Terminated!"))
+		        break
+		    }
+		    fmt.Println(bred("\n[!] Program Terminated ('Ctrl+D pressed')"))
+		    return
+		}
+		input = strings.TrimSpace(input)
 
 		switch {
 
-		case input == "exit":
-			fmt.Printf("\n   %sProgram Terminated!%s\n", bred, rst)
+		case input == "exit", input == "quit":
+			fmt.Println(bred("\n   Program Terminated!"))
 			fmt.Println("\n")
 			return
 
@@ -143,38 +186,33 @@ func main() {
 			hashFile = ""
 			outputFile = ""
 			targetHash = strings.TrimSpace(reSetHash.FindStringSubmatch(input)[1])
-			fmt.Printf("\n%s[~] Hash set to:%s %s%s%s\n", grn, rst, bylw, targetHash, rst)
+			fmt.Println(grn("\n[~] Hash set to:"), bylw(targetHash))
 
 		case reSetHashtype.MatchString(input):
 			hashtype = strings.TrimSpace(reSetHashtype.FindStringSubmatch(input)[1])
 			hashtype = strings.ToLower(hashtype)
 			if hashtype == analyzer.CheckValidHashType(hashtype) {
-				fmt.Printf("\n%s[~] Hash Type set to:%s %s%s%s\n", grn, rst, bylw, hashtype, rst)
+				fmt.Println(grn("\n[~] Hash Type set to:"), bylw(hashtype))
 			} else {
-				fmt.Printf("\n%s[!] Hashtype Value Is Invalid Or Unsupported!%s \n %s[~] These are the list of supported hashtypes to use:%s%s %s%s\n", bred, rst, bgrn, rst, bylw, analyzer.CheckValidHashType(hashtype), rst)
-				fmt.Printf("\n%s[~] Use '%shashid <hashstring>%s%s' if you don't know what hashtype to use%s\n", bgrn, bylw, rst, bgrn, rst)
+				fmt.Println(bred("\n[!] Hashtype Value Is Invalid Or Unsupported!"))
+				fmt.Println(bgrn("\n[~] Use '"), bylw("identify <hashstring>"), bgrn("' if you don't know what hashtype to use"))
 				hashtype = ""
 			}
 
 		case reHashid.MatchString(input):
-			//if targethash is not empty, just 'hashid' can be entered an it will be a reference to the targethash value
 			if len(input) == 0 && len(targetHash) != 0 {
 				input = targetHash
 			}
 			targetHash = strings.TrimSpace(reHashid.FindStringSubmatch(input)[1])
-			//hashfiles may not always be 'txt'.
-			if filepath.Ext(targetHash) == ".txt" {
+			if utils.IsFile(targetHash) {
 				usingHashFile = true
 				hashFile = targetHash
-				if len(analyzer.FileAnalyze(hashFile)) == 0 {
-					fmt.Printf("\n%s[!] Error: %s is an empty file%s", bred, hashFile, rst)
-					hashFile = ""
-					outputFile = ""
-					continue
-				} else {
-					fmt.Printf("\n%s[[[ %sEnd Of File of '%s%s%s%s'%s %s]]]%s\n", bblu, bcyn, bgrn, hashFile, rst, bcyn, rst, bblu, rst)
-					fmt.Printf("\n%s[~] Hash File set to:%s %s%s%s\n", grn, rst, bylw, hashFile, rst)
-				}
+
+				fmt.Println(analyzer.FileAnalyze(hashFile))
+				fmt.Println(bblu("\n[[[ "), bcyn("End Of File of '"), bgrn(hashFile), bcyn("'"), bblu("]]]"))
+
+				fmt.Println(grn("\n[~] Hash File set to:"), bylw(hashFile))
+
 				fileDir := filepath.Dir(hashFile)
 				fileName := filepath.Base(hashFile)
 				dot := strings.Index(fileName, ".")
@@ -191,7 +229,7 @@ func main() {
 					if err == nil {
 						goto PRACK
 					}
-					fmt.Printf("\n%s[~] Output file set to:%s %s%s%s\n", grn, rst, bylw, outputFile, rst)
+					fmt.Println(grn("\n[~] Output file set to:"), bylw(outputFile))
 				}
 			} else {
 				usingHashFile = false
@@ -199,7 +237,8 @@ func main() {
 				if len(result) == 0 {
 					targetHash = ""
 				} else {
-					fmt.Printf("\n%s[~] Hash set to:%s %s%s%s\n", grn, rst, bylw, targetHash, rst)
+					fmt.Println(analyzer.PassAnalyze(targetHash))
+					fmt.Println(grn("\n[~] Hash set to:"), bylw(targetHash))
 				}
 			}
 
@@ -207,70 +246,85 @@ func main() {
 			mode = strings.TrimSpace(reSetMode.FindStringSubmatch(input)[1])
 			mode = strings.ToLower(mode)
 			if mode == analyzer.CheckValidMode(mode) {
-				fmt.Printf("\n%s[~] Mode set to:%s %s%s%s\n", grn, rst, bylw, mode, rst)
+				fmt.Println(grn("\n[~] Mode set to:"), bylw(mode))
 			} else {
-				fmt.Printf("\n%s[!] Mode Value Is Invalid!%s \n %s[~] These are the list of accepted modes to use:%s%s %s%s\n", bred, rst, bgrn, rst, bylw, analyzer.CheckValidMode(mode), rst)
+				fmt.Println(bred("\n[!] Mode Value Is Invalid!"))
+				fmt.Print(bgrn("\n [~] These are the list of supported modes to use:"))
+				fmt.Println(bylw(analyzer.CheckValidMode(mode)))
 				mode = ""
 			}
 
 		case reSetCharset.MatchString(input):
 			charset = strings.TrimSpace(reSetCharset.FindStringSubmatch(input)[1])
-			parsedstr := brute.ParseCharset(charset)
-			fmt.Printf("\n%s[~] Char Count:%s %s%d%s\n", bgrn, rst, borng, len(parsedstr), rst)
-			fmt.Printf("\n%s[~] Parsed Charset:%s %s%s%s\n", bgrn, rst, borng, string(parsedstr), rst)
-			fmt.Printf("\n%s[~] Charset set to:%s %s%s%s\n", grn, rst, bylw, charset, rst)
+			parsedstr := crack.ParseCharset(charset)
+			fmt.Print(bgrn("\n[~] Char Count:"))
+			fmt.Println(borng(len(parsedstr)))
+			fmt.Print(bgrn("\n[~] Parsed Charset:"))
+			fmt.Println(borng(string(parsedstr)))
+			fmt.Println(grn("\n[~] Charset set to:"), bylw(charset))
 
 		case reSetDictDir.MatchString(input):
 			dictDir = strings.TrimSpace(reSetDictDir.FindStringSubmatch(input)[1])
 			_, err := os.Stat(dictDir)
 			if err != nil {
-				fmt.Printf("\n%s[!] Error: %s does not exist%s", bred, dictDir, rst)
-				fmt.Printf("\n%s[+] Cross check if it's not a file path typographical error%s\n", bylw, rst)
+				fmt.Print(bred("\n[!] Error: "), dictDir, " does not exist")
+				fmt.Println(borng("\n[+] Cross check if it's not a file path typographical error"))
 				continue
 			}
-			fmt.Printf("\n%s[~] Dict path set to:%s %s%s%s\n", grn, rst, bylw, dictDir, rst)
 			var dictNum int
 			dict_files, err := filepath.Glob(filepath.Join(dictDir, "*.txt"))
 			if err != nil {
-				fmt.Printf("\n%s[!] Error Scanning Directory %s: %v %s\n", red, dictDir, err, rst)
+				fmt.Printf(bred("\n[!] Error Scanning Directory %s: "), dictDir, err)
 				return
 			}
 			if len(dict_files) == 0 {
-				fmt.Printf("\n%s[!] Error: No Files Found In %s%s\n", red, dictDir, rst)
+				fmt.Print(red("\n[!] Error: No Files Found In "), dictDir)
 				return
 			}
 			for dictNum, _ = range dict_files {
 			}
 			dictNumber := dictNum + 1
 
-			fmt.Printf("\n%s[~] Found%s %s%d%s %swordlist files from%s %s%s%s\n", bgrn, rst, borng, dictNumber, rst, bgrn, rst, borng, dictDir, rst)
+			fmt.Print(bgrn("\n[~] Found "), borng(dictNumber), bgrn(" wordlist files from "), borng(dictDir))
+			fmt.Println(grn("\n[~] Dict path set to:"), bylw(dictDir))
 
 		case reBruteRange.MatchString(input):
 			downcase := strings.ToLower(input)
-			trimStart := strings.TrimPrefix(downcase, "set brute-range")
-			num := strings.Split(trimStart, "-")
-			startNum := strings.TrimSpace(num[0])
-			endNum := strings.TrimSpace(num[1])
+			trimRange := strings.TrimPrefix(downcase, "set brute-range")
+			if strings.Contains(trimRange, "-") {
+				num := strings.Split(trimRange, "-")
+				startNum := strings.TrimSpace(num[0])
+				endNum := strings.TrimSpace(num[1])
 
-			value, err := strconv.Atoi(startNum)
-			if err != nil {
-				fmt.Printf("%s[!] Error: %s%s", bred, err, rst)
-			}
-			startLen = value
+				value, err := strconv.Atoi(startNum)
+				if err != nil {
+					fmt.Printf(bred("[!] Error: %v"), err)
+				}
+				startLen = value
 
-			val, err := strconv.Atoi(endNum)
-			if err != nil {
-				fmt.Printf("%s[!] Error: %s%s", bred, err, rst)
-			}
-			endLen = val
+				val, err := strconv.Atoi(endNum)
+				if err != nil {
+					fmt.Printf(bred("[!] Error: %v"), err)
+				}
+				endLen = val
 
-			if startLen >= endLen {
-				fmt.Printf("\n%s[!] Error: Minimum length cannot be greater than Maximum length%s\n", bred, rst)
-				startLen = 0
-				endLen = 0
+				if startLen >= endLen {
+					fmt.Print(bred("\n[!] Error: Minimum length cannot be greater than Maximum length"))
+					startLen = 0
+					endLen = 0
+				} else {
+					fmt.Println(grn("\n[~] Brute Min Length set to:"), bylw(startLen))
+					fmt.Println(grn("\n[~] Brute Max Length set to:"), bylw(endLen))
+				}
 			} else {
-				fmt.Printf("\n%s[~] Brute Min Length set to:%s %s%d%s\n", grn, rst, bylw, startLen, rst)
-				fmt.Printf("\n%s[~] Brute Max Length set to:%s %s%d%s\n", grn, rst, bylw, endLen, rst)
+				trimRange = strings.TrimSpace(trimRange)
+				value, err := strconv.Atoi(trimRange)
+				if err != nil {
+					fmt.Printf(bred("[!] Error: %v"), err)
+				}
+				startLen = value
+				endLen = startLen
+				fmt.Println(grn("\n[~] Brute Length set to:"), bylw(startLen))
 			}
 
 		case reSetInput.MatchString(input):
@@ -279,18 +333,15 @@ func main() {
 			hashFile = strings.TrimSpace(reSetInput.FindStringSubmatch(input)[1])
 			_, err := os.Stat(hashFile)
 			if err != nil {
-				fmt.Printf("\n%s[!] Error: %s does not exist%s", bred, hashFile, rst)
-				fmt.Printf("\n%s[+] Cross check if it's not a file path typographical error%s\n", bylw, rst)
+				fmt.Print(bred("\n[!] Error: "), hashFile, " does not exist")
+				fmt.Println(borng("\n[+] Cross check if it's not a file path typographical error"))
 				hashFile = ""
 				continue
 			}
-			result := utils.FileLaunch(hashFile, 0, 0644)
-			var hashNum int
-			for hashNum, _ = range result {
-			}
-			hashNumber := hashNum + 1
-			fmt.Printf("\n%s[~] Hash File set to:%s %s%s%s\n", grn, rst, bylw, hashFile, rst)
-			fmt.Printf("\n%s[~] Found%s %s%d%s %shashes in%s %s%s%s\n", bgrn, rst, borng, hashNumber, rst, bgrn, rst, borng, hashFile, rst)
+			totalLines := file.FileCount(hashFile)
+			fmt.Println(grn("\n[~] Hash file set to:"), bylw(hashFile))
+
+			fmt.Print(bgrn("\n[~] Found "), borng(totalLines), bgrn(" hashes in "), borng(hashFile))
 			fileDir := filepath.Dir(hashFile)
 			fileName := filepath.Base(hashFile)
 			dot := strings.Index(fileName, ".")
@@ -307,50 +358,48 @@ func main() {
 				if err == nil {
 					goto PACK
 				}
-				fmt.Printf("\n%s[~] Output file set to:%s %s%s%s\n", grn, rst, bylw, outputFile, rst)
+				fmt.Println(grn("\n[~] Output file set to:"), bylw(outputFile))
 			}
 
 		case reSetOutput.MatchString(input):
 			usingHashFile = true
 			outputFile = strings.TrimSpace(reSetOutput.FindStringSubmatch(input)[1])
-			fmt.Printf("\n%s[~] Output file set to:%s %s%s%s\n", grn, rst, bylw, outputFile, rst)
+			fmt.Println(grn("\n[~] Output file set to:"), bylw(outputFile))
 
 		case reSetRules.MatchString(input):
 			ruleFile = strings.TrimSpace(reSetRules.FindStringSubmatch(input)[1])
 			if _, err := os.Stat(ruleFile); errors.Is(err, fs.ErrNotExist) {
-				fmt.Printf("\n%s[!] Error: %s does not exist%s", bred, ruleFile, rst)
-				fmt.Printf("\n%s[+] Cross check if it's not a file path typographical error%s\n", bylw, rst)
+				fmt.Print(bred("\n[!] Error: "), ruleFile, " does not exist")
+				fmt.Println(bylw("\n[+] Cross check if it's not a file path typographical error"))
 				ruleFile = ""
 				continue
 			}
-			fmt.Printf("\n%s[~] Rule file set to:%s %s%s%s\n", grn, rst, bylw, ruleFile, rst)
+			fmt.Println(grn("\n[~] Rule file set to:"), bylw(ruleFile))
 
 		case reUnsetRules.MatchString(input):
 			if len(ruleFile) == 0 {
-				fmt.Printf("%s[!] Error:%sNo rule file loaded!%s\n", bred, bylw, rst)
+				fmt.Println(bred("[!] Error: No rule file loaded!"))
 			} else {
 				ruleFile = ""
-				fmt.Printf("\n%s[~] Rule file dropped successfully!%s\n", bgrn, rst)
+				fmt.Println(bgrn("\n[~] Rule file dropped successfully!"))
 			}
 
 		case input == "run":
-			//hash file cracking
 			if len(targetHash) == 0 && len(hashFile) == 0 {
 				cond.HashConditions(targetHash, hashtype, mode, charset, dictDir, startLen, endLen)
 			} else if len(hashFile) != 0 && len(outputFile) != 0 {
 				cond.FileConditions(hashFile, hashtype, mode, charset, dictDir, startLen, endLen, outputFile)
 			} else if len(ruleFile) != 0 && len(hashFile) == 0 && usingHashFile == false {
-				//rule file
 				if len(targetHash) == 0 {
-					fmt.Printf("\n%s[!] Error: No hash set!%s %sUse %s'%sset hash <hashstring>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+					fmt.Println(bred("\n[!] Error: No hash set!"), bgrn("Use"), bylw("'set hash <hashstring>'"))
 				} else if len(hashtype) == 0 {
-					fmt.Printf("\n%s[!] Error: No hash type set!%s %sUse %s '%sset hashtype <value>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+					fmt.Println(bred("\n[!] Error: No hash type set!"), bgrn("Use"), bylw("'set hashtype <value>'"))
 				} else if len(mode) == 0 {
-					fmt.Printf("\n%s[!] Error: No mode set!%s %sUse %s'%sset mode <value>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+					fmt.Println(bred("\n[!] Error: No mode set!"), bgrn("Use"), bylw("'set mode <value>'"))
 				} else if mode == "dict" {
-					cracker.PassCrack(dictDir, targetHash, hashtype, ruleFile)
+					crack.PassCrack(dictDir, targetHash, hashtype, ruleFile)
 				} else if mode == "brute" && len(charset) != 0 {
-					brute.BruteGen(targetHash, hashtype, charset, startLen, endLen)
+					crack.BruteGen(targetHash, hashtype, charset, startLen, endLen)
 					goto START
 				}
 			} else if len(targetHash) != 0 {
@@ -360,8 +409,8 @@ func main() {
 			}
 
 		default:
-			fmt.Printf("\n%s[!] Unknown command:%s %sType%s '%shelp%s' %sfor available commands.%s\n", bred, rst, grn, rst, bylw, rst, grn, rst)
+			dym := utils.DidYouMean(input)
+			fmt.Print(bgrn("\nDid you mean: "), bcyn(dym), bgrn(" ?\n"))
 		}
-
 	}
 }

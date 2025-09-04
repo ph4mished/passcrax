@@ -1,68 +1,65 @@
 package analyzer
 
-//import "passcrax/core/utils"
 import (
-	"bufio"
-	"errors"
-	"fmt"
-	"io/fs"
-	"os"
-	"strings"
+        "bufio"
+        "errors"
+        "fmt"
+        "io/fs"
+        "os"
+        "strings"
+
+        //"github.com/fatih/color"
 )
 
+func percentage(num, total int) float64 {
+        return (float64(num) / float64(total)) * 100
+}
+
+
 func FileAnalyze(hashFile string) string {
-	/*
-	   var numlines int
-	   var hashline, result string
-	   var same []string
-	   //boolan := make(map[string]bool)
-	   allLines := utils.FileLaunch(hashFile, os.O_RDWR, 0755)
-	   //lets use the length of lines to keep them together
-	   //put the hashes together by length and check their hashtypes
-	   //this is to reduce the spamming in the hashid output
+    hash_counts := make(map[string]int)
+    total_hashes := 0
+    var allResults []string
 
-	   	   for numlines, hashline = range allLines{
-	   	   part := len(hashline)
-	   	   if len(hashline) == part {
+    file, err := os.Open(hashFile)
+    if err != nil {
+        bred.Printf("\n[!] Error: %v", err)
+        return ""
+    }
+    defer file.Close()
+    
+    if _, err = os.Stat(hashFile); errors.Is(err, fs.ErrNotExist) {
+        bred.Printf("\n[!] Error: %s does not exist\n", hashFile)
+        return ""
+    }
 
-	   	   //result = PassAnalyze(hashline)
-	   	   //if !boolan[result] {
-	   	  // if result == result{
-	   	  // boolan[result] = true
-	   	   fmt.Println("Hashline: ", len(hashline))
-	   	   same = append(same, hashline)
-	   	   }
-	   	  // }
-	   	   }
-	   	   numlines = numlines + 1
-	   	  // if len(hashline) != 0{
-	   				//	fmt.Printf("There are %d lines after analysis\n", len(result))
-	   					//}
-	   					fmt.Printf("hashfile lines: %d\n", numlines)
-	   					fmt.Println("these matched: ", same)
-	   			        //fmt.Println(result)
+    
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        hashLine := strings.TrimSpace(scanner.Text())
+        if len(hashLine) > 0 {
+            total_hashes++
+            hashtype := PassAnalyze(hashLine)
+            hash_counts[hashtype]++
+        }
+    }
 
-	   					//this should printout the percentage of lines with the same hashtype
-	*/
-	var result string
-	filename, err := os.Open(hashFile)
-	defer filename.Close()
-	if err != nil {
-		fmt.Printf("%s[!] Error: Cannot open %s%s", bred, hashFile, rst)
-	}
-	if _, err = os.Stat(hashFile); errors.Is(err, fs.ErrNotExist) {
-		fmt.Printf("\n%s[!] Error: %s does not exist%s\n", bred, hashFile, rst)
-		return ""
-	}
-	scanner := bufio.NewScanner(filename)
-	for scanner.Scan() {
-		hashLine := scanner.Text()
-		hashLine = strings.TrimSpace(hashLine)
-		fmt.Printf("\n%s", hashLine)
-		if len(hashLine) != 0 {
-			result = PassAnalyze(hashLine)
-		}
+   
+    bgrn.Print("\n[~] Found ")
+    borng.Print(total_hashes)
+    bgrn.Print(" hashes in ")
+    bblu.Print(hashFile)
 
-	}
-	return result
+   
+    for hashtype, count := range hash_counts {
+        pct := percentage(count, total_hashes)
+        
+        
+        result := bgrn.Sprint("\n\n{") + bylw.Sprintf("%.2f%%", pct) + bgrn.Sprint("}") + bcyn.Sprintf(" %d/%d Of The Hashes Are:\n", count, total_hashes) + fmt.Sprintf(" %s", hashtype)
+
+     //   allResults = strings.Join(result, "\n")
+        allResults = append(allResults, result)
+    }
+    resultStr := strings.Join(allResults, "\n")
+    return resultStr
 }

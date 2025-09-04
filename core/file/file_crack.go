@@ -1,67 +1,67 @@
 package file
 
 import (
-	"passcrax/core/cracker"
-	"passcrax/core/cracker/brute"
-	"passcrax/core/utils"
-	//"passcrax/core/rules"
+	"passcrax/core/crack"
+	//	"passcrax/core/utils"
+	//
+	// "passcrax/core/rules"
 )
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
-const (
-	borng = "\033[1;38;5;208m"
-	bgrn  = "\033[1;32m"
-	bblu  = "\033[1;34m"
-	bred  = "\033[1;31m"
-	bylw  = "\033[1;33m"
-	grn   = "\033[32m"
-	blu   = "\033[34m"
-	ylw   = "\033[33m"
-	red   = "\033[31m"
-	orng  = "\033[38;5;208m"
-	rst   = "\033[0m"
-)
-
-func DictFile(dict_dir string, hashFile string, hashtype string, outputFile string) string {
-	filename := utils.FileLaunch(hashFile, os.O_RDWR, 0755)
-	file, _ := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+func DictFile(dict_dir string, hashFile string, hashtype string, outputFile string){
+	//dangerous function.. can cause OOM if hashFile is too huge
+	//	filename := utils.FileLaunch(hashFile, os.O_RDWR, 0755)
+	file, err := os.Open(hashFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	defer file.Close()
+	outFile, _ := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	defer outFile.Close()
 	header := fmt.Sprintf("\n\n\n###---These Are Results From %s---\n### Time: %v\n\n", hashFile, time.Now())
-	file.Write([]byte(header))
+	outFile.Write([]byte(header))
 
-	for _, targetHash := range filename {
-		if true {
-			var word_dir string
-			if len(dict_dir) != 0 {
-				word_dir = dict_dir
-			} else {
-				word_dir = ""
-			}
-			now := cracker.PassCrack(word_dir, targetHash, hashtype, "")
-			results := fmt.Sprintf("%s : %s\n", targetHash, now)
-			file.Write([]byte(results))
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		targetHash := strings.TrimSpace(scanner.Text())
+		if len(dict_dir) == 0 {
+			dict_dir = ""
+		}
+		if targetHash != ""{
+		now := crack.PassCrack(dict_dir, targetHash, hashtype, "")
+		results := fmt.Sprintf("%s : %s\n", targetHash, now)
+		outFile.Write([]byte(results))
 		}
 	}
-	return ""
+	return
 }
 
 func BruteFile(hashFile string, hashtype string, charset string, outputFile string, min int, max int) {
-	filename := utils.FileLaunch(hashFile, os.O_RDWR, 0644)
-	file, _ := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	file, err := os.Open(hashFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	outFile, _ := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	defer file.Close()
 	header := fmt.Sprintf("\n\n\n###---These Are Results From %s---\n### Time: %v\n\n", hashFile, time.Now())
-	file.Write([]byte(header))
-
-	for _, targetHash := range filename {
-		if true {
-			non := brute.BruteGen(targetHash, hashtype, charset, min, max)
-			bond := fmt.Sprintf("%s : %s\n", targetHash, non)
-			file.Write([]byte(bond))
+	outFile.Write([]byte(header))
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		targetHash := strings.TrimSpace(scanner.Text())
+if targetHash != ""{
+		non := crack.BruteGen(targetHash, hashtype, charset, min, max)
+		bond := fmt.Sprintf("%s : %s\n", targetHash, non)
+		outFile.Write([]byte(bond))
 		}
 	}
 }

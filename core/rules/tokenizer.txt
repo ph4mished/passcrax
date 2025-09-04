@@ -1,0 +1,86 @@
+package rules
+import(
+    )
+    
+    //this is my first lexer and parser where I'm using part of my logic because the Lexer I'm looking up to is meant for programming languages 
+    
+    type Token struct {
+        Type string
+        Literal string
+        }
+       
+       /*others to add are: 
+r = reverse,
+l = lowercase all,
+u = uppercase all
+D<n> = Delete char at position n,
+[ = Delete first char, 
+] = Delete last char,
+{ = rotate the word to the left,
+} = rotate the word to the right,
+t = toggle case of all letters (small t),
+C = lowercase first, capitalize rest(capital c),
+p<n> = repeat the word n times,
+f = reflect the word (append reversed of word)
+: = no change (passthrough)
+*/
+/*const (
+    SUBSTITUTE = "s"
+    REV = "r",
+    TOG_ALL = "t"
+    REFLECT = "f"
+    UPPER = "u"
+    LOWER = "l"
+    APPEND = "$"
+    PREPEND = "^"
+    DUPLICATE = "d"
+    CAPITALIZE = "c"
+    )*/
+    
+    var keywords := map[string]int {
+     "s" : SUBSTITUTE,
+     "r": REV,
+     "t": TOG_ALL,
+     "f": REFLECT,
+     "u": UPPER,
+     "l": LOWER,
+     "$": APPEND,
+     "^": PREPEND,
+     "d": DUPLICATE,
+     "c": CAPITALIZE,
+        }
+        
+        
+type Lexer struct {
+    //current position 
+    curPos int
+    //next position 
+    nextPos int
+    //current char 
+    curChar rune
+    //input
+  //  Input []rune
+  }
+  
+//this is a rule engine Lexer and parser. so it will work differently from a  
+  func (l *Lexer) NextChar(){
+      //This function is meant to moved to the next char
+      l.curChar++
+      }
+  
+  func (l *Lexer) IsWhiteSpace() {
+      //define white spaces that needs to be skipped. comments can be written in a different function 
+   /*  if l.curChar == '#' {
+          return l.NextChar()
+          }*/
+          if l.curChar == ' '{
+              l.NextChar()
+              }
+      }
+  
+//  func (l *Lexer) readChar(){
+      
+      
+func (l *Lexer) readLine() {
+    //how do I get the line 
+    }

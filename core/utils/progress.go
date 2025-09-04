@@ -3,7 +3,22 @@ package utils
 import (
 	"fmt"
 	"time"
+
+//	"github.com/fatih/color"
 )
+
+/*var (
+	bgrn = color.New(color.FgGreen, color.Bold)
+	bred = color.New(color.FgRed, color.Bold)
+	bblu = color.New(color.FgBlue, color.Bold)
+	bcyn = color.New(color.FgCyan, color.Bold)
+	bylw = color.New(color.FgYellow, color.Bold)
+	grn  = color.New(color.FgGreen)
+	red  = color.New(color.FgRed)
+	blu  = color.New(color.FgBlue)
+	cyn  = color.New(color.FgCyan)
+	ylw  = color.New(color.FgYellow)
+)*/
 
 func formatDuration(timeDur time.Duration) string {
 	secs := int(timeDur.Seconds())
@@ -24,7 +39,6 @@ func formatDuration(timeDur time.Duration) string {
 }
 
 func PrintProgress(cracked, total int, startTime time.Time) {
-	//var totalTime time.Time
 	progress := float64(cracked) / float64(total)
 	percent := progress * 100
 
@@ -33,9 +47,9 @@ func PrintProgress(cracked, total int, startTime time.Time) {
 	bar := ""
 	for i := 0; i < barLength; i++ {
 		if i < filledLength {
-			bar = "\u2588" + bar
+			bar += "\u2588"
 		} else {
-			bar = bar + "_"
+			bar += "_"
 		}
 	}
 
@@ -53,5 +67,34 @@ func PrintProgress(cracked, total int, startTime time.Time) {
 	} else {
 		eta = "ETA: --"
 	}
-	fmt.Printf("\r%s[%s%s%s%s%s] %.2f%% %s|%s %s%.2fH/s %s%s|%s %s%s%s", bgrn, rst, bblu, bar, rst, bgrn, percent, bcyn, rst, bgrn, velocity, rst, bcyn, rst, bgrn, eta, rst)
+
+	bgrn.Print("\r[")
+	bblu.Print(bar)
+	bgrn.Print("]")
+	bgrn.Printf(" %.2f%%", percent)
+	bcyn.Print(" | ")
+	bgrn.Printf("%.2fH/s", velocity)
+	bcyn.Print(" | ")
+	bgrn.Print(eta)
+}
+
+// Optional helper functions for consistent color usage throughout in this tool.. will be of  use later
+func PrintError(message string) {
+	bred.Printf("ERROR: %s\n", message)
+}
+
+func PrintWarning(message string) {
+	bylw.Printf("WARNING: %s\n", message)
+}
+
+func PrintSuccess(message string) {
+	bgrn.Printf("SUCCESS: %s\n", message)
+}
+
+func PrintInfo(message string) {
+	bblu.Printf("INFO: %s\n", message)
+}
+
+func PrintDebug(message string) {
+	cyn.Printf("DEBUG: %s\n", message)
 }

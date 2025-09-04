@@ -1,10 +1,11 @@
-package brute
+package crack
 
 import (
 	"strings"
 	"unicode"
 )
 
+// isRange function is needed. this can be used to tell ranges
 func ParseCharset(charset string) []rune {
 	charset = strings.Trim(charset, "[]")
 	tokens := strings.Split(charset, " ")

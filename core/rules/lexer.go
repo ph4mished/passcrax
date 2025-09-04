@@ -2,6 +2,7 @@ package rules
 
 //import "rules/ruless"
 import (
+	"fmt"
 	"strings"
 	//  "bufio"
 	//  "os"
@@ -40,7 +41,7 @@ func Lexer(ruleWord string, word string) string {
 		return Duplicate(ruleWord, word)
 
 	case 'c':
-		return Capitalize(ruleWord, word)
+		return Capitalize(word)
 
 	case 'T':
 		return Toggle(ruleWord, word)
@@ -52,5 +53,6 @@ func Lexer(ruleWord string, word string) string {
 		return ""
 
 	}
+	fmt.Print("Found Nothing")
 	return ""
 }

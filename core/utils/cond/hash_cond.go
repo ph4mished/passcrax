@@ -1,100 +1,131 @@
 package cond
 
-//import "passcrax/core/utils"
-import "passcrax/core/cracker"
-import "passcrax/core/cracker/brute"
-import "passcrax/core/file"
-
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+//	"path/filepath"
+
+	"passcrax/core/crack"
+	"passcrax/core/file"
+
+	"github.com/fatih/color"
 )
 
-const (
-	bcyn  = "\033[1;36m"
-	bgrn  = "\033[1;32m"
-	borng = "\033[1;38;5;208m"
-	bblu  = "\033[1;34m"
-	bred  = "\033[1;31m"
-	bylw  = "\033[1;33m"
-	grn   = "\033[32m"
-	blu   = "\033[34m"
-	ylw   = "\033[33m"
-	red   = "\033[31m"
-	orng  = "\033[38;5;208m"
-	rst   = "\033[0m"
+var (
+	bgrn = color.New(color.FgGreen, color.Bold)
+	bred = color.New(color.FgRed, color.Bold)
+	bblu = color.New(color.FgBlue, color.Bold)
+	bcyn = color.New(color.FgCyan, color.Bold)
+	bylw = color.New(color.FgYellow, color.Bold)
+	grn  = color.New(color.FgGreen)
+	red  = color.New(color.FgRed)
+	blu  = color.New(color.FgBlue)
+	cyn  = color.New(color.FgCyan)
+	ylw  = color.New(color.FgYellow)
 )
 
+// This looks so much messy and unmaintainable
 func HashConditions(targetHash string, hashtype string, mode string, charset string, dictDir string, startLen int, endLen int) string {
 	if len(targetHash) == 0 {
-		fmt.Printf("\n%s[!] Error: No hash set!%s %sUse %s'%sset hash <hashstring>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+		bred.Print("\n[!] Error: No hash set!")
+		bgrn.Print(" Use ")
+		bylw.Print("'set hash <hashstring>'")
 	} else if len(hashtype) == 0 {
-		fmt.Printf("\n%s[!] Error: No hash type set!%s %sUse %s '%sset hashtype <value>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+		bred.Print("\n[!] Error: No hash type set!")
+		bgrn.Print(" Use ")
+		bylw.Print("'set hashtype <value>'")
 	} else if (len(charset) == 0) && (mode == "brute" || mode == "auto") {
-		fmt.Printf("\n%s[!] Error: No brute characters set!%s %sUse %s'%sset charset <value>%s'\n%s [+] The value should be enclosed in%s %ssquare brakets%s %sfollowed by a%s %srange of alphabets or numbers or special chars%s %swhich are seperated by%s %shyphens%s.\n %s[+] Remember the spaces too%s\n %seg.%s %sset charset [a-g A-R 0-5 &*^#]%s\n", bred, rst, bgrn, rst, bylw, rst, bgrn, rst, bylw, rst, bgrn, rst, bylw, rst, bgrn, rst, bylw, rst, bgrn, rst, bgrn, rst, borng, rst)
+		bred.Print("\n[!] Error: No brute characters set")
+		bgrn.Print(" Use ")
+		bylw.Print("'set charset <value>'")
+		bgrn.Print("\n [+] The value should be enclosed in ")
+		bylw.Print("square brackets")
+		bgrn.Print(" followed by a ")
+		bylw.Print("range of alphabets or numbers or special chars")
+		bgrn.Print(" which are separated by ")
+		bylw.Print("hyphens")
+		bblu.Print("\n[+] Remember the spaces too. \n eg. ")
+		bylw.Println("set charset [a-g A-R 0-5 &*^#]")
 	} else if len(mode) == 0 {
-		fmt.Printf("\n%s[!] Error: No mode set!%s %sUse %s'%sset mode <value>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+		bred.Print("\n[!] Error: No mode set!")
+		bgrn.Print(" Use ")
+		bylw.Print("'set mode <value>'")
 	}
 	if mode == "brute" && len(targetHash) != 0 && len(hashtype) != 0 && len(charset) != 0 {
 		if endLen == 0 && startLen == 0 {
-			fmt.Printf("\n%s[!] Error: Minimum Length and Maximum Length Cannot Be Empty In BruteForce Mode%s\n %sUse %s'%sset brute-range <min-max>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+			bred.Println("\n[!] Error: Minimum Length and Maximum Length Cannot Be Empty In BruteForce Mode")
+			bgrn.Print(" Use ")
+			bylw.Println("'set brute-range <min-max>'")
 			return ""
 		}
-		brute_crx := brute.BruteGen(targetHash, hashtype, charset, startLen, endLen)
+		brute_crx := crack.BruteGen(targetHash, hashtype, charset, startLen, endLen)
 		if len(brute_crx) != 0 {
-			fmt.Printf("\n\n%s[~] Password Found:%s %s%s%s\n", bgrn, rst, borng, brute_crx, rst)
+			bgrn.Println("\n\n[~] Password Found:")
+			bblu.Println(brute_crx)
 		} else {
-			fmt.Printf("\n\n%s[!] Password Not Found!%s\n", bred, rst)
+			bred.Println("\n\n[!] Password Not Found!")
 		}
 	} else if mode == "dict" && len(targetHash) != 0 && len(hashtype) != 0 {
 		if len(dictDir) != 0 {
-			letgo := cracker.PassCrack(dictDir, targetHash, hashtype, "")
+			bgrn.Print("\n[~] Utilizing ")
+			bylw.Printf("%s", dictDir)
+			bgrn.Println(" for wordlist cracking")
+			letgo := crack.PassCrack(dictDir, targetHash, hashtype, "")
 			if len(letgo) != 0 {
-				fmt.Printf("\n\n%s[~] Password Found:%s %s%s%s\n", bgrn, rst, borng, letgo, rst)
+				bgrn.Println("\n\n[~] Password Found:")
+				bylw.Println(letgo)
 				return ""
 			} else {
-				fmt.Printf("\n\n%s[!] Password Not Found!%s\n", bred, rst)
+				bred.Println("\n\n[!] Password Not Found!")
 			}
 		} else {
-			fmt.Printf("\n\n%s[!] No wordlist path defined!%s \n%s[~] Falling back to default wordlists%s\n", bylw, rst, bgrn, rst)
-			nin := cracker.PassCrack("", targetHash, hashtype, "")
+			bylw.Println("\n\n[!] No wordlist path defined!")
+			bgrn.Println("[~] Falling back to default wordlists")
+			nin := crack.PassCrack("", targetHash, hashtype, "")
 			if len(nin) != 0 {
-				fmt.Printf("\n\n%s[~] Password Found:%s %s%s%s\n", bgrn, rst, borng, nin, rst)
+				bgrn.Println("\n\n[~] Password Found:")
+				bylw.Println(nin)
 				return ""
 			} else {
-				fmt.Printf("\n\n%s[!] Password Not Found!%s\n", bred, rst)
+				bred.Println("\n\n[!] Password Not Found!")
 			}
 		}
 	} else if mode == "auto" && len(targetHash) != 0 && len(hashtype) != 0 && len(charset) != 0 {
 		var cracked_password string
 		if len(dictDir) != 0 {
-			cracked_password = cracker.PassCrack(dictDir, targetHash, hashtype, "")
+			bgrn.Print("\n[~] Utilizing ")
+			bylw.Printf("%s", dictDir)
+			bgrn.Println(" for wordlist cracking")
+			cracked_password = crack.PassCrack(dictDir, targetHash, hashtype, "")
 			if len(cracked_password) != 0 {
-				fmt.Printf("\n\n%s[~] Password Found:%s %s%s%s\n", bgrn, rst, borng, cracked_password, rst)
+				bylw.Println(cracked_password)
 				return ""
 			} else {
-				fmt.Printf("\n\n%s[!] Password Not Found!%s\n", bred, rst)
+				bred.Println("\n\n[!] Password Not Found!")
 			}
 		} else {
-			fmt.Printf("\n\n%s[!] No wordlist path defined!%s \n%s[~] Falling back to default wordlists%s\n", bylw, rst, bgrn, rst)
-			cracked_password = cracker.PassCrack("", targetHash, hashtype, "")
+			bylw.Println("\n\n[!] No wordlist path defined!")
+			bgrn.Println("[~] Falling back to default wordlists")
+			cracked_password = crack.PassCrack("", targetHash, hashtype, "")
 		}
 		if cracked_password != "" {
 		}
 		if startLen != 0 && endLen != 0 {
-			fmt.Printf("\n%s[~] Switching To Bruteforce (%d-%dcharacters)...%s\n", bylw, startLen, endLen, rst)
+			bylw.Println("\n\n[!] Password Not Found In Wordlist....")
+			bylw.Printf("\n[~] Switching To Bruteforce (%d-%d characters)...\n", startLen, endLen)
 		} else {
-			fmt.Printf("\n\n%s[!] Password Not Found In Wordlist....%s\n\n%s[~] Switching To Bruteforce (1-7 characters)...%s\n", bylw, rst, bblu, rst)
+			bylw.Println("\n\n[!] Password Not Found In Wordlist....")
+			bylw.Println("\n[~] Switching To Bruteforce (1-7 characters)...")
 			startLen = 1
 			endLen = 7
 		}
-		result := brute.BruteGen(targetHash, hashtype, charset, startLen, endLen)
+		result := crack.BruteGen(targetHash, hashtype, charset, startLen, endLen)
 		if len(result) != 0 {
-			fmt.Printf("\n\n%s[~] Password Found:%s %s%s%s\n", bgrn, rst, borng, result, rst)
+			bgrn.Println("\n\n[~] Password Found:")
+			bylw.Println(result)
 			return ""
 		} else {
-			fmt.Printf("\n\n%s[!] Password Not Found!%s\n", bred, rst)
+			bred.Println("\n\n[!] Password Not Found!")
 		}
 		return ""
 	}
@@ -103,12 +134,26 @@ func HashConditions(targetHash string, hashtype string, mode string, charset str
 
 func FileConditions(hashFile string, hashtype string, mode string, charset string, dictDir string, startLen int, endLen int, outputFile string) string {
 	if len(hashtype) == 0 {
-		fmt.Printf("\n%s[!] Error: No hash type set!%s %sUse %s '%sset hashtype <value>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+		bred.Print("\n[!] Error: No hash type set!")
+		bgrn.Print(" Use ")
+		bylw.Print("'set hashtype <value>'")
 	} else if len(charset) == 0 && (mode == "brute" || mode == "auto") {
-		fmt.Printf("\n%s[!] Error: No brute characters set!%s %sUse %s'%sset charset <value>%s'\n %s[+] The value should be enclosed in%s %ssquare brakets%s %sfollowed by a%s %srange of alphabets or numbers or special chars%s %swhich are seperated by%s %shyphens%s\n %s[+] Remember the spaces too%s. \n %seg.%s %sset charset [a-g A-R 0-5 &*^#]%s\n", bred, rst, bgrn, rst, bylw, rst, bgrn, rst, bylw, rst, bgrn, rst, bylw, rst, bgrn, rst, bylw, rst, bgrn, rst, bgrn, rst, borng, rst)
+		bred.Print("\n[!] Error: No brute characters set")
+		bgrn.Print(" Use ")
+		bylw.Print("'set charset <value>'")
+		bgrn.Print("\n [+] The value should be enclosed in ")
+		bylw.Print("square brackets")
+		bgrn.Print(" followed by a ")
+		bylw.Print("range of alphabets or numbers or special chars")
+		bgrn.Print(" which are separated by ")
+		bylw.Print("hyphens")
+		bblu.Print("\n[+] Remember the spaces too. \n eg. ")
+		bylw.Println("set charset [a-g A-R 0-5 &*^#]")
 	} else if mode == "brute" && len(hashFile) != 0 && len(hashtype) != 0 && len(charset) != 0 {
 		if endLen == 0 && startLen == 0 {
-			fmt.Printf("\n%s[!] Error: Minimum Length and Maximum Length Cannot Be Empty In BruteForce Mode%s\n %sUse %s'%sset brute-range <min-max>%s'\n", bred, rst, bgrn, rst, bylw, rst)
+			bred.Println("\n[!] Error: Minimum Length and Maximum Length Cannot Be Empty In BruteForce Mode")
+			bgrn.Print(" Use ")
+			bylw.Print("'set brute-range <min-max>'\n")
 			return ""
 		}
 		file.BruteFile(hashFile, hashtype, charset, outputFile, startLen, endLen)
@@ -123,10 +168,18 @@ func FileConditions(hashFile string, hashtype string, mode string, charset strin
 		totalbrtnum := allbrtnum + 1
 		brtnumtop := totalbrtnum - brtnumber
 
-		fmt.Printf("\n\n%s[~] Cracking Completed: %s%s%d/%d%s%s passwords recovered!%s\n", bgrn, rst, borng, brtnumtop, totalbrtnum, rst, bgrn, rst)
-		fmt.Printf("\n%s[~] Results copied to %s%s%s %ssuccessfully!%s\n", bgrn, bylw, outputFile, rst, bgrn, rst)
+		bgrn.Printf("\n[~] Cracking Completed: ")
+		bblu.Printf("%d/%d", brtnumtop, totalbrtnum)
+		bgrn.Printf("  passwords recovered", brtnumtop)
+
+		bgrn.Print("\n[~] Results copied to ")
+		bylw.Print(outputFile)
+		bgrn.Print(" successfully!")
 	} else if mode == "dict" && len(hashFile) != 0 && len(hashtype) != 0 {
 		if len(dictDir) != 0 {
+			bgrn.Print("\n[~] Utilizing ")
+			bylw.Print(dictDir)
+			bgrn.Println(" for wordlist cracking")
 			file.DictFile(dictDir, hashFile, hashtype, outputFile)
 			var dictnum, alldictnum int
 			totaldictLines, readDictLines := file.FileRead(outputFile)
@@ -139,10 +192,16 @@ func FileConditions(hashFile string, hashtype string, mode string, charset strin
 			totaldictnum := alldictnum + 1
 			dictnumtop := totaldictnum - dictnumber
 
-			fmt.Printf("\n\n%s[~] Cracking Completed: %s%s%d/%d%s%s passwords recovered!%s\n", bgrn, rst, borng, dictnumtop, totaldictnum, rst, bgrn, rst)
-			fmt.Printf("\n%s[~] Results copied to %s%s%s %ssuccessfully!%s\n", bgrn, bylw, outputFile, rst, bgrn, rst)
+			bgrn.Printf("\n\n[~] Cracking Completed: ")
+			bblu.Printf("%d/%d", dictnumtop, totaldictnum)
+			bgrn.Print(" passwords recovered", )
+
+			bgrn.Print("\n[~] Results copied to ")
+			bylw.Print(outputFile)
+			bgrn.Print(" successfully!")
 		} else {
-			fmt.Printf("\n\n%s[!] No wordlist path defined!%s \n%s[~] Falling back to default wordlists%s\n", bylw, rst, bgrn, rst)
+			bylw.Println("\n\n[!] No wordlist path defined!")
+			bgrn.Println("[~] Falling back to default wordlists")
 			file.DictFile("", hashFile, hashtype, outputFile)
 			var dictnum, alldictnum int
 			totaldictLines, readDictLines := file.FileRead(outputFile)
@@ -154,29 +213,32 @@ func FileConditions(hashFile string, hashtype string, mode string, charset strin
 			dictnumber := dictnum + 1
 			totaldictnum := alldictnum + 1
 			dictnumtop := totaldictnum - dictnumber
+			bgrn.Printf("\n\n[~] Cracking Completed: ")
+			bblu.Printf("%d/%d", dictnumtop, totaldictnum)
+			bgrn.Print(" passwords recovered")
 
-			fmt.Printf("\n\n%s[~] Cracking Completed: %s%s%d/%d%s%s passwords recovered!%s\n", bgrn, rst, borng, dictnumtop, totaldictnum, rst, bgrn, rst)
-			fmt.Printf("\n%s[~] Results copied to %s%s%s %ssuccessfully!%s\n", bgrn, bylw, outputFile, rst, bgrn, rst)
+			bgrn.Print("\n[~] Results copied to ")
+			bylw.Print(outputFile)
+			bgrn.Print(" successfully!")
 		}
 	} else if mode == "auto" && len(hashFile) != 0 && len(hashtype) != 0 && len(charset) != 0 {
 		if len(dictDir) != 0 {
-			cracked_hashline := file.DictFile(dictDir, hashFile, hashtype, outputFile)
-			if cracked_hashline != "" {
-			}
+			bgrn.Print("\n[~] Utilizing ")
+			bblu.Print(dictDir)
+			bgrn.Println(" for wordlist cracking")
+			file.DictFile(dictDir, hashFile, hashtype, outputFile)
 		} else {
-			fmt.Printf("\n\n%s[!] No wordlist path defined!%s \n%s[~] Falling back to default wordlists%s\n", bylw, rst, bgrn, rst)
-			cracked_hashline := file.DictFile("", hashFile, hashtype, outputFile)
-			if cracked_hashline != "" {
-			}
+			bylw.Println("\n\n[!] No wordlist path defined!")
+			file.DictFile("", hashFile, hashtype, outputFile)
 		}
 		var num, allnum int
 		var read_line string
-		tmp_file := "/tmp.txt"
-		dir := filepath.Dir(outputFile)
-		addend := dir + tmp_file
-		tmpFile, err := os.OpenFile(addend, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+		tmp_file := "tmp/passcrax_tmp.txt"
+	//	dir := filepath.Dir(outputFile)
+	//	addend := dir + tmp_file
+		tmpFile, err := os.OpenFile(tmp_file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 		defer tmpFile.Close()
-		defer os.RemoveAll(addend)
+		defer os.RemoveAll(tmp_file)
 		if err != nil {
 			fmt.Println("Error: ", err)
 		}
@@ -192,22 +254,25 @@ func FileConditions(hashFile string, hashtype string, mode string, charset strin
 		totalnum := allnum + 1
 		numtop := totalnum - number
 
-		fmt.Printf("\n%s[~] %s%s%d/%d%s%s passwords recovered!%s\n", bgrn, rst, borng, numtop, totalnum, rst, bgrn, rst)
-		fmt.Printf("\n%s[~] %s%s%d%s %shashes remain uncracked!%s\n", bgrn, rst, borng, number, rst, bgrn, rst)
+		bgrn.Printf("\n\n[~] ")
+		bblu.Printf("%d/%d", numtop, totalnum)
+		bgrn.Print(" passwords recovered")
+		bgrn.Print("\n[~] ")
+		bblu.Print(number)
+		bgrn.Print(" hashes remain uncracked!")
 		if startLen != 0 && endLen != 0 {
-			fmt.Printf("\n%s[~] Switching To Bruteforce (%d-%dcharacters)...%s\n", bylw, startLen, endLen, rst)
+			bgrn.Println("\n[~] Bruteforce Range Defined")
+			bylw.Printf("\n[~] Switching To Bruteforce (%d-%d characters)...\n", startLen, endLen)
 		} else {
-			fmt.Printf("\n%s[~] Switching To Bruteforce (1-7characters)...%s\n", bylw, rst)
+			bylw.Println("\n[~] Switching To Bruteforce (1-7 characters)...")
 			startLen = 1
 			endLen = 7
 		}
 
-		file.BruteFile(addend, hashtype, charset, outputFile, startLen, endLen)
-		fmt.Printf("\n\n%s[~] Results copied to %s%s%s %ssuccessfully!%s\n", bgrn, bylw, outputFile, rst, bgrn, rst)
-		//}//else if mode != "dict" && mode != "brute" && mode != "auto"{
-		//mode = ""
-		//validMode := "dict, brute, auto"
-		//fmt.Printf("\n%s[!] Inputted Mode Is Invalid!%s \n %sThese are the list of accepted modes to use for file hashes:%s%s %s%s\n", bred, rst, bgrn, rst, bylw, validMode, rst)
+		file.BruteFile(tmp_file, hashtype, charset, outputFile, startLen, endLen)
+		bgrn.Print("\n[~] Results copied to ")
+		bylw.Printf("%s", outputFile)
+		bgrn.Print(" successfully!")
 	} else {
 		return ""
 	}

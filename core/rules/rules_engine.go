@@ -5,6 +5,24 @@ import (
 	"strings"
 )
 
+//there will be improvisations where the parser and rule engine will support more commands on a line
+
+/*others to add are:
+r = reverse,
+l = lowercase all,
+u = uppercase all
+D<n> = Delete char at position n,
+[ = Delete first char,
+] = Delete last char,
+{ = rotate the word to the left,
+} = rotate the word to the right,
+t = toggle case of all letters (small t),
+C = lowercase first, capitalize rest(capital c),
+p<n> = repeat the word n times,
+f = reflect the word (append reversed of word)
+: = no change (passthrough)
+*/
+
 //for this one a lexer, parser and ast is required else, things are gonna get complicated
 //note that sometimes a command wont be the always be the first. else the script will assume the next command is a strings. such as 'c $s^sad'  after capitalization the rest are ignore.
 //I'll come back to it
@@ -87,7 +105,7 @@ func Toggle(ruleString string, word string) string {
 	}
 }
 
-func Capitalize(ruleString string, word string) string {
+func Capitalize(word string) string {
 	var capital string
 	capital = strings.Title(word)
 	return capital
