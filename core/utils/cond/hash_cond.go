@@ -44,8 +44,8 @@ func HashConditions(targetHash string, hashtype string, mode string, charset str
 		bylw.Print("range of alphabets or numbers or special chars")
 		bgrn.Print(" which are separated by ")
 		bylw.Print("hyphens")
-		bblu.Print("\n[+] Remember the spaces too. \n eg. ")
-		bylw.Println("set charset [a-g A-R 0-5 &*^#]")
+		bblu.Print("\n eg. ")
+		bylw.Println("set charset [a-gA-R0-5&*^#]")
 	} else if len(mode) == 0 {
 		bred.Print("\n[!] Error: No mode set!")
 		bgrn.Print(" Use ")
@@ -147,8 +147,8 @@ func FileConditions(hashFile string, hashtype string, mode string, charset strin
 		bylw.Print("range of alphabets or numbers or special chars")
 		bgrn.Print(" which are separated by ")
 		bylw.Print("hyphens")
-		bblu.Print("\n[+] Remember the spaces too. \n eg. ")
-		bylw.Println("set charset [a-g A-R 0-5 &*^#]")
+		bblu.Print("\n eg. ")
+		bylw.Println("set charset [a-gA-R0-5&*^#]")
 	} else if mode == "brute" && len(hashFile) != 0 && len(hashtype) != 0 && len(charset) != 0 {
 		if endLen == 0 && startLen == 0 {
 			bred.Println("\n[!] Error: Minimum Length and Maximum Length Cannot Be Empty In BruteForce Mode")
@@ -234,7 +234,7 @@ func FileConditions(hashFile string, hashtype string, mode string, charset strin
 		var num, allnum int
 		var read_line string
 		tmp_file := "tmp/passcrax_tmp.txt"
-	//	dir := filepath.Dir(outputFile)
+		//dir := filepath.Dir(outputFile)
 	//	addend := dir + tmp_file
 		tmpFile, err := os.OpenFile(tmp_file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 		defer tmpFile.Close()

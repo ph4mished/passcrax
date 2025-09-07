@@ -60,7 +60,7 @@ func Help() {
 	grn.Println(" - This command is used to set cracking mode to {brute (bruteforce), dict (wordlist cracking), or auto (bruteforce + wordlist cracking)}")
 
 	orng.Print("set charset [char ranges]")
-	grn.Println(" - This command accepts characters for bruteforce cracking. Characters are ranges of letters, numbers, and symbols enclosed in square brackets (eg. set charset [a-g A-R 0-5 &*^#])")
+	grn.Println(" - This command accepts characters for bruteforce cracking. Characters are ranges of letters, numbers, and symbols enclosed in square brackets (eg. set charset [a-gA-R0-5&*^#])")
 
 	orng.Print("load rulefile <filepath>")
 	grn.Println(" - This command accepts and loads the filepath with word mangling rules (eg. load rulefile /home/my_files/hashed.rule)")
