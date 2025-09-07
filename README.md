@@ -54,12 +54,12 @@ Without wasting much time, let's dive into the <strong>features of passcrax</str
 
     
 <h2>Installation & Usage</h2>
-    <p><em>git clone https://github.com/ph4mished/passcrax.git<br>
+    <p><pre><code><em>git clone https://github.com/ph4mished/passcrax.git<br>
     cd passcrax<br>
     go build passcrax.go<br>
     cd passcrax<br>
     go build <br>
-    ./passcrax</em></p>
+    ./passcrax</em></code></pre></p>
 <h2>Contribution & License</h2>
     <ul>
         <li><strong>Open to feedback</strong> (You can please report issues or suggest improvements).</li>
