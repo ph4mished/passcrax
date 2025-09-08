@@ -24,8 +24,10 @@ func ParseCharset(charsetStr string) []rune {
             }
 
             if ch == '-' && prevRune != none && nextRune != none {
+                //this for ranges, range parsing starts here
                 
                         if (unicode.IsLetter(prevRune) && unicode.IsLetter(nextRune)) || (unicode.IsDigit(prevRune) && unicode.IsDigit(nextRune)) {
+                            //valid rages
                                 for r := prevRune; r <= nextRune; r++ {
                                         if !seen[r] {
                                                 seen[r] = true
@@ -33,6 +35,7 @@ func ParseCharset(charsetStr string) []rune {
                                         }
                                 }
                         }else {
+                            //if not a valid range, assume it's a literal.
                                 for _, uniSymbol := range charset {
                                         if !seen[uniSymbol] {
                                                 seen[uniSymbol] = true
@@ -42,6 +45,7 @@ func ParseCharset(charsetStr string) []rune {
                         }
 
             } else {
+                //else assume it's a literal
                                 if !seen[ch] {
                                         seen[ch] = true
                                         allChars = append(allChars, ch)

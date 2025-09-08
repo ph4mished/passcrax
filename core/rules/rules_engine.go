@@ -6,18 +6,19 @@ import (
 )
 
 //there will be improvisations where the parser and rule engine will support more commands on a line
+//this code need shortening 
 
 /*others to add are:
 r = reverse,
-l = lowercase all,
-u = uppercase all
+l = lowercase all, ...Done
+u = uppercase all. ..Done
 D<n> = Delete char at position n,
-[ = Delete first char,
-] = Delete last char,
+[ = Delete first char, ..Done
+] = Delete last char,   ...Done
 { = rotate the word to the left,
 } = rotate the word to the right,
 t = toggle case of all letters (small t),
-C = lowercase first, capitalize rest(capital c),
+C = lowercase first, capitalize rest(capital c), ..done
 p<n> = repeat the word n times,
 f = reflect the word (append reversed of word)
 : = no change (passthrough)
@@ -29,59 +30,24 @@ f = reflect the word (append reversed of word)
 
 //there will be improvisations where the parser and rule engine will support more commands on a line
 
-func LeetSpeak(ruleString string, word string) string {
-	//if the string that follows is "s" it might be perceived as a command and it will be skipped
-	//this isnt good
-	var replace string
-	split := strings.Split(ruleString, "")
-	from := split[1]
-	to := split[2]
-
-	replace = strings.ReplaceAll(word, from, to)
-	return replace
-	return replace
+//this function wouldn't do any splitting any more. the splitting will be done by the lexer
+//so it will be like
+//Let's peak(firstPar, secondPar, word string)
+func LeetSpeak(realRune, repRune rune, word string) string {
+    return strings.ReplaceAll(word, string(realRune), string(repRune)
 }
 
-func Prepend(ruleString string, word string) string {
-	var preppend string
-	split := strings.Split(ruleString, "^")
-	if len(split) > 1 {
-		join := strings.Join(split, "")
-		reSplit := strings.Split(join, " ")
-		reJoin := strings.Join(reSplit, "")
-		result := reJoin + word
-		return result
-	} else {
-		split = strings.Split(ruleString, "")
-		first := split[1]
-
-		preppend = first + word
-	}
-	return preppend
+func Prepend(prepRune rune, word string) string {
+	return string(prepRune)+word
 }
 
-func Append(ruleString string, word string) string {
 
-	var appnd string
-	ruleString = strings.TrimSpace(ruleString)
-	split := strings.Split(ruleString, "$")
-	if len(split) > 1 {
-		join := strings.Join(split, "")
-		reSplit := strings.Split(join, " ")
-		reJoin := strings.Join(reSplit, "")
-		result := word + reJoin
-		return result
-	} else {
-
-		split = strings.Split(ruleString, "")
-		last := split[1]
-
-		appnd = word + last
-	}
-	return appnd
+func Append(appRune rune,  word string) string {
+	return word+string(appRune)
 }
 
 func Toggle(ruleString string, word string) string {
+    //I'll surely shorten this when I'm less busy
 	split := strings.Split(ruleString, "")
 	num := split[1]
 	rrune := []rune(word)
@@ -106,16 +72,48 @@ func Toggle(ruleString string, word string) string {
 }
 
 func Capitalize(word string) string {
-	var capital string
-	capital = strings.Title(word)
-	return capital
+	return strings.Title(word)
 }
 
-func Duplicate(ruleString string, word string) string {
-	var repeat string
-	strings.Split(ruleString, "")
-	number := strings.Count(ruleString, "d")
-	rep := number * 2
-	repeat = strings.Repeat(word, rep)
-	return repeat
+
+
+func CapitalizeAll(word string) string{
+   return strings.ToTitle(word)
+   }
+   
+   
+   
+func LowerAll(word) string {
+return strings.ToLower(word)
+}
+
+
+func LowerFirstCapAll(word string) string {
+ low := strings.ToLower(word[:1])
+ return low+strings.ToTitle(word[1:])
+}
+   
+   
+
+func Duplicate(dCount int, word string) string {
+	rep := ruleString * 2
+	return strings.Repeat(word, rep)
+}
+
+func Reverse(word string) string {
+    n := len(word)
+    reversed := make([]rune, n)
+    for _, r := range word {
+        n--
+        reversed[n] = r
+    }
+    return string(reversed[n:])
+}
+
+func DeleteFirst(word string) string {
+  return word[1:]
+}
+
+func DeleteLast(word string) string {
+  return word[:len(word)-1]
 }
