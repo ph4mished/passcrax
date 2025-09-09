@@ -4,3 +4,21 @@ set charset [a-z0-5@]#€]]
 rm -rf passcrax
 exi
 exit
+identify /storage/emulated/0/hashed.txt
+set hashtype sha256
+status
+set mode auto
+run
+identify /storage/emulated/0/hashed.txt
+set hashtype sha256
+run
+set mode auto
+run
+set charset [a-z]
+status
+run
+load dicdir /storage/emulated/0/Wordlist
+load dictdir /storage/emulated/0/Wordlists
+run
+help
+load hashfile /storage/emulated/0/hashed.txt

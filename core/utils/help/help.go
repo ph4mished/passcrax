@@ -42,9 +42,9 @@ func Help() {
 	orng.Print("Ctrl+c")
 	grn.Println(" - These commands close the program")
 
-	orng.Print("hashid <hashstring>")
+	orng.Print("identify <hashstring>")
 	grn.Print(" or ")
-	orng.Print("hashid <filepath>")
+	orng.Print("identify <filepath>")
 	grn.Println(" - This command helps analyze and identify the hashtype of a given hash or file (eg. hashid 49f68a5c8493ec2c0bf489821c21fc3b) (eg. hashid /home/my_files/hashed.txt)")
 
 	orng.Print("set mode auto")
